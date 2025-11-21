@@ -381,12 +381,13 @@ function migrateHistogram(config: VisualizationConfig): VizLayer[] {
       bin: true,
       axis: { labelAngle: -45 }
     };
+    // Count aggregation for histograms - using the field with count aggregation
+    layer.encodings.y = {
+      field: config.xField,
+      type: 'quantitative',
+      aggregate: 'count'
+    };
   }
-  layer.encodings.y = {
-    field: '*',
-    type: 'quantitative',
-    aggregate: 'count'
-  };
 
   return [layer];
 }

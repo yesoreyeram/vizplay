@@ -64,6 +64,8 @@ const markTypes = [
   { value: 'rule', label: 'Rule' },
   { value: 'text', label: 'Text' },
   { value: 'trail', label: 'Trail' },
+  { value: 'arc', label: 'Arc (Pie/Donut)' },
+  { value: 'boxplot', label: 'Box Plot' },
   { value: 'geoshape', label: 'Geo Shape' },
 ];
 
