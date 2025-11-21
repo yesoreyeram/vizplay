@@ -37,6 +37,7 @@ export interface Dataset {
     funnelLabelType?: 'none' | 'value' | 'percentage' | 'both';
     funnelShowConversionRate?: boolean;
     funnelGap?: number;
+    funnelColorScheme?: 'blue' | 'green' | 'red' | 'purple' | 'orange' | 'redgreen' | 'greenred';
   };
 }
 

@@ -457,7 +457,7 @@ export function generateVegaSpec(
       const isHorizontal = funnelOrientation === 'horizontal';
 
       // Determine color scheme
-      let colorScheme: string;
+      let colorScheme: string = 'blues'; // Default
       let colorRange: string[] | undefined;
       
       switch (funnelColorScheme) {
