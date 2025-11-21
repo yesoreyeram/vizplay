@@ -133,7 +133,24 @@ function App() {
     setDataFormat(dataset.format);
     setJsonataExpression('');
     setFieldMappings([]);
-    setChartTitle(`${dataset.name} Visualization`);
+    
+    // Apply visualization configuration if provided
+    if (dataset.vizConfig) {
+      setVizType(dataset.vizConfig.type);
+      setChartTitle(dataset.vizConfig.title || `${dataset.name} Visualization`);
+      
+      // Set fields after a short delay to ensure data is parsed
+      setTimeout(() => {
+        if (dataset.vizConfig.xField) setXField(dataset.vizConfig.xField);
+        if (dataset.vizConfig.yField) setYField(dataset.vizConfig.yField);
+        if (dataset.vizConfig.colorField) setColorField(dataset.vizConfig.colorField);
+        else setColorField('__none__');
+        if (dataset.vizConfig.sizeField) setSizeField(dataset.vizConfig.sizeField);
+        else setSizeField('__none__');
+      }, 100);
+    } else {
+      setChartTitle(`${dataset.name} Visualization`);
+    }
   };
 
   const handleManualInputChange = (value: string) => {

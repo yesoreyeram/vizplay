@@ -2,10 +2,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2 } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, BarChart4, Layers } from 'lucide-react';
 
 const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   bar: BarChart3,
+  'stacked-bar': Layers,
+  'grouped-bar': BarChart4,
   line: TrendingUp,
   area: AreaChart,
   scatter: Circle,
@@ -123,9 +125,11 @@ export function VisualizationControls({
         </Select>
       </div>
 
-      {['scatter', 'bar', 'line'].includes(vizType) && (
+      {['scatter', 'bar', 'line', 'stacked-bar', 'grouped-bar'].includes(vizType) && (
         <div className="space-y-1.5">
-          <Label htmlFor="color-field" className="text-xs">Color Field (optional)</Label>
+          <Label htmlFor="color-field" className="text-xs">
+            Color Field {['stacked-bar', 'grouped-bar'].includes(vizType) ? '(required for grouping)' : '(optional)'}
+          </Label>
           <Select value={colorField} onValueChange={onColorFieldChange}>
             <SelectTrigger id="color-field" className="h-8 text-sm">
               <SelectValue placeholder="Select field" />

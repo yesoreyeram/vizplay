@@ -11,6 +11,8 @@ export interface VisualizationConfig {
 
 export const visualizationTypes = [
   { id: 'bar', name: 'Bar Chart', description: 'Compare values across categories' },
+  { id: 'stacked-bar', name: 'Stacked Bar', description: 'Show composition across categories' },
+  { id: 'grouped-bar', name: 'Grouped Bar', description: 'Compare multiple dimensions side-by-side' },
   { id: 'line', name: 'Line Chart', description: 'Show trends over time' },
   { id: 'area', name: 'Area Chart', description: 'Show cumulative trends' },
   { id: 'scatter', name: 'Scatter Plot', description: 'Show correlation between variables' },
@@ -61,6 +63,29 @@ export function generateVegaSpec(
           x: { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } },
           y: { field: config.yField, type: 'quantitative' },
           color: config.colorField ? { field: config.colorField, type: 'nominal' } : undefined,
+        },
+      };
+
+    case 'stacked-bar':
+      return {
+        ...baseSpec,
+        mark: { type: 'bar', tooltip: true },
+        encoding: {
+          x: { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } },
+          y: { field: config.yField, type: 'quantitative' },
+          color: config.colorField ? { field: config.colorField, type: 'nominal' } : { value: '#60a5fa' },
+        },
+      };
+
+    case 'grouped-bar':
+      return {
+        ...baseSpec,
+        mark: { type: 'bar', tooltip: true },
+        encoding: {
+          x: { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } },
+          y: { field: config.yField, type: 'quantitative' },
+          color: config.colorField ? { field: config.colorField, type: 'nominal' } : { value: '#60a5fa' },
+          xOffset: config.colorField ? { field: config.colorField, type: 'nominal' } : undefined,
         },
       };
 

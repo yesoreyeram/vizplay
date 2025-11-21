@@ -7,6 +7,15 @@ export interface Dataset {
   tags: string[];
   format: 'json' | 'csv' | 'tsv';
   data: string;
+  // Optional visualization configuration - applied when dataset is loaded
+  vizConfig?: {
+    type: string;
+    xField?: string;
+    yField?: string;
+    colorField?: string;
+    sizeField?: string;
+    title?: string;
+  };
 }
 
 export const sampleDatasets: Dataset[] = [
@@ -25,7 +34,71 @@ export const sampleDatasets: Dataset[] = [
       { product: 'Monitor', sales: 18000, quantity: 60 },
       { product: 'Keyboard', sales: 8500, quantity: 210 },
       { product: 'Mouse', sales: 6200, quantity: 180 },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'product',
+      yField: 'sales',
+      title: 'Product Sales Comparison',
+    }
+  },
+  {
+    id: 'viz-stacked-bar',
+    name: '📊 Stacked Bar Chart Example',
+    description: 'Quarterly revenue by product category - ideal for stacked bar charts',
+    category: 'Visualization Examples',
+    tags: ['stacked-bar', 'example', 'revenue', 'quarterly'],
+    format: 'json',
+    data: JSON.stringify([
+      { quarter: 'Q1', category: 'Electronics', revenue: 125000 },
+      { quarter: 'Q1', category: 'Clothing', revenue: 85000 },
+      { quarter: 'Q1', category: 'Food', revenue: 62000 },
+      { quarter: 'Q2', category: 'Electronics', revenue: 145000 },
+      { quarter: 'Q2', category: 'Clothing', revenue: 92000 },
+      { quarter: 'Q2', category: 'Food', revenue: 68000 },
+      { quarter: 'Q3', category: 'Electronics', revenue: 162000 },
+      { quarter: 'Q3', category: 'Clothing', revenue: 108000 },
+      { quarter: 'Q3', category: 'Food', revenue: 75000 },
+      { quarter: 'Q4', category: 'Electronics', revenue: 185000 },
+      { quarter: 'Q4', category: 'Clothing', revenue: 125000 },
+      { quarter: 'Q4', category: 'Food', revenue: 82000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'stacked-bar',
+      xField: 'quarter',
+      yField: 'revenue',
+      colorField: 'category',
+      title: 'Quarterly Revenue by Category (Stacked)',
+    }
+  },
+  {
+    id: 'viz-grouped-bar',
+    name: '📊 Grouped Bar Chart Example',
+    description: 'Sales comparison by region and product - ideal for grouped bar charts',
+    category: 'Visualization Examples',
+    tags: ['grouped-bar', 'multi-dimension', 'example', 'comparison'],
+    format: 'json',
+    data: JSON.stringify([
+      { region: 'North', product: 'Product A', sales: 42000 },
+      { region: 'North', product: 'Product B', sales: 58000 },
+      { region: 'North', product: 'Product C', sales: 35000 },
+      { region: 'South', product: 'Product A', sales: 38000 },
+      { region: 'South', product: 'Product B', sales: 62000 },
+      { region: 'South', product: 'Product C', sales: 45000 },
+      { region: 'East', product: 'Product A', sales: 55000 },
+      { region: 'East', product: 'Product B', sales: 48000 },
+      { region: 'East', product: 'Product C', sales: 52000 },
+      { region: 'West', product: 'Product A', sales: 48000 },
+      { region: 'West', product: 'Product B', sales: 72000 },
+      { region: 'West', product: 'Product C', sales: 41000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'grouped-bar',
+      xField: 'region',
+      yField: 'sales',
+      colorField: 'product',
+      title: 'Sales by Region and Product (Grouped)',
+    }
   },
   {
     id: 'viz-line-chart',
@@ -47,7 +120,13 @@ export const sampleDatasets: Dataset[] = [
       { date: '2024-10', temperature: 16.9, humidity: 57 },
       { date: '2024-11', temperature: 10.2, humidity: 63 },
       { date: '2024-12', temperature: 6.1, humidity: 67 },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'line',
+      xField: 'date',
+      yField: 'temperature',
+      title: 'Monthly Temperature Trends',
+    }
   },
   {
     id: 'viz-area-chart',
@@ -63,7 +142,13 @@ export const sampleDatasets: Dataset[] = [
       { quarter: 'Q4 2023', users: 24800, activeUsers: 21200 },
       { quarter: 'Q1 2024', users: 31500, activeUsers: 27800 },
       { quarter: 'Q2 2024', users: 39200, activeUsers: 35100 },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'area',
+      xField: 'quarter',
+      yField: 'users',
+      title: 'User Growth Over Time',
+    }
   },
   {
     id: 'viz-scatter-plot',
@@ -85,7 +170,14 @@ export const sampleDatasets: Dataset[] = [
       { income: 68000, spending: 45000, age: 37, category: 'Mid Career' },
       { income: 88000, spending: 54000, age: 43, category: 'Mid Career' },
       { income: 135000, spending: 75000, age: 55, category: 'Senior' },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'scatter',
+      xField: 'income',
+      yField: 'spending',
+      colorField: 'category',
+      title: 'Income vs Spending by Category',
+    }
   },
   {
     id: 'viz-pie-chart',
@@ -100,7 +192,13 @@ export const sampleDatasets: Dataset[] = [
       { company: 'DataSys', marketShare: 18.7 },
       { company: 'CloudNet', marketShare: 12.8 },
       { company: 'Others', marketShare: 7.7 },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'pie',
+      xField: 'company',
+      yField: 'marketShare',
+      title: 'Market Share Distribution',
+    }
   },
   {
     id: 'viz-heatmap',
@@ -130,7 +228,14 @@ export const sampleDatasets: Dataset[] = [
       { day: 'Friday', hour: '12 PM', visits: 250 },
       { day: 'Friday', hour: '3 PM', visits: 175 },
       { day: 'Friday', hour: '6 PM', visits: 145 },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'heatmap',
+      xField: 'hour',
+      yField: 'day',
+      colorField: 'visits',
+      title: 'Website Activity Heatmap',
+    }
   },
   {
     id: 'viz-box-plot',
@@ -161,7 +266,13 @@ export const sampleDatasets: Dataset[] = [
       { class: 'Class C', score: 94 },
       { class: 'Class C', score: 96 },
       { class: 'Class C', score: 98 },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'boxplot',
+      xField: 'class',
+      yField: 'score',
+      title: 'Test Scores Distribution by Class',
+    }
   },
   {
     id: 'viz-histogram',
@@ -178,7 +289,13 @@ export const sampleDatasets: Dataset[] = [
       { age: 48 }, { age: 50 }, { age: 52 }, { age: 54 }, { age: 55 },
       { age: 25 }, { age: 28 }, { age: 30 }, { age: 32 }, { age: 35 },
       { age: 38 }, { age: 40 }, { age: 42 }, { age: 45 }, { age: 48 },
-    ], null, 2)
+    ], null, 2),
+    vizConfig: {
+      type: 'histogram',
+      xField: 'age',
+      yField: '__count__',
+      title: 'Age Distribution of Customers',
+    }
   },
 
   // Business & Finance
