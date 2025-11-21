@@ -6,7 +6,6 @@ import { DataInputSection } from './components/DataInputSection';
 import { DataParsingControls } from './components/DataParsingControls';
 import { VisualizationControls } from './components/VisualizationControls';
 import { VisualizationRender } from './components/VisualizationRender';
-import { DatasetDialog } from './components/DatasetDialog';
 import { parseData, inferDataSchema } from './lib/dataParser';
 import type { DataFormat, FieldMapping } from './lib/dataParser';
 import { generateVegaSpec, getAvailableFields } from './lib/visualizations/vegaSpecs';
@@ -143,12 +142,15 @@ function App() {
               <Panel defaultSize={60} minSize={20}>
                 <div className="h-full border-r">
                   <div className="h-full flex flex-col">
-                    <div className="border-b p-2.5 flex items-center justify-between">
+                    <div className="border-b p-2.5">
                       <h2 className="font-semibold text-sm">Data Input</h2>
-                      <DatasetDialog onLoadDataset={handleLoadDataset} />
                     </div>
                     <div className="flex-1 overflow-hidden">
-                      <DataInputSection value={rawData} onChange={setRawData} />
+                      <DataInputSection 
+                        value={rawData} 
+                        onChange={setRawData}
+                        onLoadDataset={handleLoadDataset}
+                      />
                     </div>
                   </div>
                 </div>
