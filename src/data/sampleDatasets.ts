@@ -32,6 +32,9 @@ export interface Dataset {
     legendPosition?: 'none' | 'left' | 'right' | 'top' | 'bottom';
     legendMode?: 'inline' | 'table' | 'popup';
     customVizConfig?: CustomVizConfig; // CustomVizConfig from builder
+    treemapNesting?: 'flat' | 'nested';
+    treemapColorScheme?: 'category10' | 'tableau10' | 'blues' | 'greens' | 'reds' | 'viridis';
+    treemapLabels?: boolean;
   };
 }
 
@@ -687,6 +690,101 @@ export const sampleDatasets: Dataset[] = [
       colorField: 'load',
       title: 'Server Load by Time',
       legendPosition: 'right',
+    }
+  },
+
+  // Treemap Examples
+  {
+    id: 'viz-treemap-flat',
+    name: '🗺️ Tree Map - Flat',
+    description: 'Product category sales distribution using flat treemap layout',
+    category: 'Visualization Examples',
+    tags: ['treemap', 'hierarchy', 'proportions'],
+    format: 'json',
+    data: JSON.stringify([
+      { category: 'Electronics', revenue: 450000, margin: 35 },
+      { category: 'Clothing', revenue: 320000, margin: 55 },
+      { category: 'Home & Garden', revenue: 280000, margin: 42 },
+      { category: 'Sports', revenue: 195000, margin: 38 },
+      { category: 'Books', revenue: 145000, margin: 25 },
+      { category: 'Toys', revenue: 125000, margin: 48 },
+      { category: 'Automotive', revenue: 95000, margin: 32 },
+      { category: 'Beauty', revenue: 85000, margin: 60 },
+      { category: 'Food & Beverage', revenue: 75000, margin: 22 },
+      { category: 'Office Supplies', revenue: 55000, margin: 45 },
+    ], null, 2),
+    vizConfig: {
+      type: 'treemap',
+      xField: 'category',
+      yField: 'revenue',
+      colorField: 'category',
+      title: 'Product Category Revenue Distribution',
+      treemapNesting: 'flat',
+      treemapColorScheme: 'category10',
+      treemapLabels: true,
+      legendPosition: 'right',
+    }
+  },
+
+  {
+    id: 'viz-treemap-gradient',
+    name: '🗺️ Tree Map - Color Gradient',
+    description: 'Market share visualization with gradient color by margin percentage',
+    category: 'Visualization Examples',
+    tags: ['treemap', 'gradient', 'market-share'],
+    format: 'json',
+    data: JSON.stringify([
+      { company: 'Company A', marketShare: 28.5, profitMargin: 45 },
+      { company: 'Company B', marketShare: 22.3, profitMargin: 38 },
+      { company: 'Company C', marketShare: 18.7, profitMargin: 52 },
+      { company: 'Company D', marketShare: 12.4, profitMargin: 29 },
+      { company: 'Company E', marketShare: 8.9, profitMargin: 61 },
+      { company: 'Company F', marketShare: 5.2, profitMargin: 35 },
+      { company: 'Others', marketShare: 4.0, profitMargin: 25 },
+    ], null, 2),
+    vizConfig: {
+      type: 'treemap',
+      xField: 'company',
+      yField: 'marketShare',
+      colorField: 'profitMargin',
+      title: 'Market Share by Profit Margin',
+      treemapNesting: 'flat',
+      treemapColorScheme: 'viridis',
+      treemapLabels: true,
+      colorGradient: true,
+      legendPosition: 'right',
+    }
+  },
+
+  {
+    id: 'viz-treemap-nested',
+    name: '🗺️ Tree Map - Nested',
+    description: 'Department budget allocation with nested hierarchical view',
+    category: 'Visualization Examples',
+    tags: ['treemap', 'nested', 'budget', 'hierarchy'],
+    format: 'json',
+    data: JSON.stringify([
+      { department: 'Engineering', budget: 2500000 },
+      { department: 'Sales', budget: 1800000 },
+      { department: 'Marketing', budget: 1200000 },
+      { department: 'Operations', budget: 950000 },
+      { department: 'HR', budget: 650000 },
+      { department: 'Finance', budget: 580000 },
+      { department: 'Customer Support', budget: 420000 },
+      { department: 'R&D', budget: 380000 },
+      { department: 'Legal', budget: 320000 },
+      { department: 'IT', budget: 280000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'treemap',
+      xField: 'department',
+      yField: 'budget',
+      colorField: 'department',
+      title: 'Department Budget Allocation',
+      treemapNesting: 'nested',
+      treemapColorScheme: 'tableau10',
+      treemapLabels: true,
+      legendPosition: 'bottom',
     }
   },
 

@@ -26,6 +26,10 @@ export interface VisualizationConfig {
   legendMode?: 'inline' | 'table' | 'popup';
   // Custom viz builder config
   customVizConfig?: CustomVizConfig;
+  // Treemap options
+  treemapNesting?: 'flat' | 'nested';
+  treemapColorScheme?: 'category10' | 'tableau10' | 'blues' | 'greens' | 'reds' | 'viridis';
+  treemapLabels?: boolean;
 }
 
 export const visualizationTypes = [
@@ -38,6 +42,7 @@ export const visualizationTypes = [
   { id: 'heatlane', name: 'Heat Lane', description: 'Show categorical data with color intensity' },
   { id: 'boxplot', name: 'Box Plot', description: 'Show distribution statistics' },
   { id: 'histogram', name: 'Histogram', description: 'Show frequency distribution' },
+  { id: 'treemap', name: 'Tree Map', description: 'Show hierarchical data with nested rectangles' },
   { id: 'custom', name: 'Custom Vega-Lite', description: 'Advanced custom visualization with full Vega-Lite spec control' },
 ];
 
@@ -485,6 +490,150 @@ export function generateVegaSpec(
           y: { aggregate: 'count', type: 'quantitative' },
         },
       };
+
+    case 'treemap': {
+      // Tree map visualization using layer-based approach
+      const treemapNesting = config.treemapNesting || 'flat';
+      const treemapColorScheme = config.treemapColorScheme || 'category10';
+      const treemapLabels = config.treemapLabels !== false; // Default to true
+      
+      // For flat treemap (single level)
+      if (treemapNesting === 'flat') {
+        const layers: any[] = [];
+        
+        // Main rect layer
+        const rectLayer: any = {
+          mark: { type: 'rect', tooltip: true, stroke: '#0a0e1a', strokeWidth: 2 },
+          encoding: {
+            x: {
+              field: config.xField,
+              type: 'nominal',
+              axis: null,
+            },
+            y: {
+              field: config.yField || config.sizeField,
+              type: 'quantitative',
+              aggregate: 'sum',
+              axis: null,
+            },
+            color: config.colorField && config.colorField !== '__none__' 
+              ? {
+                  field: config.colorField,
+                  type: config.colorGradient ? 'quantitative' : 'nominal',
+                  scale: { scheme: treemapColorScheme },
+                  legend: showLegend ? { orient: legendOrient } : null
+                }
+              : {
+                  field: config.xField,
+                  type: 'nominal',
+                  scale: { scheme: treemapColorScheme },
+                  legend: showLegend ? { orient: legendOrient } : null
+                },
+          },
+          transform: [
+            {
+              window: [{ op: 'rank', as: 'rank' }],
+              sort: [{ field: config.yField || config.sizeField, order: 'descending' }],
+            },
+          ],
+        };
+        
+        layers.push(rectLayer);
+        
+        // Add text labels layer if enabled
+        if (treemapLabels) {
+          const textLayer: any = {
+            mark: { type: 'text', fontSize: 14, color: '#ffffff', fontWeight: 'bold' },
+            encoding: {
+              x: {
+                field: config.xField,
+                type: 'nominal',
+                axis: null,
+              },
+              y: {
+                field: config.yField || config.sizeField,
+                type: 'quantitative',
+                aggregate: 'sum',
+                axis: null,
+              },
+              text: { field: config.xField, type: 'nominal' },
+            },
+          };
+          layers.push(textLayer);
+        }
+        
+        return {
+          ...baseSpec,
+          layer: layers,
+        };
+      } else {
+        // Nested treemap - requires specific data structure with parent-child relationships
+        // This uses Vega's built-in treemap layout via mark type
+        const layers: any[] = [];
+        
+        // Main treemap layer with nesting
+        const treemapLayer: any = {
+          mark: { type: 'rect', tooltip: true, stroke: '#0a0e1a', strokeWidth: 2 },
+          encoding: {
+            x: {
+              field: config.xField,
+              type: 'nominal',
+              axis: null,
+            },
+            y: {
+              field: config.yField || config.sizeField,
+              type: 'quantitative',
+              aggregate: 'sum',
+              axis: null,
+              stack: 'zero',
+            },
+            color: config.colorField && config.colorField !== '__none__'
+              ? {
+                  field: config.colorField,
+                  type: config.colorGradient ? 'quantitative' : 'nominal',
+                  scale: { scheme: treemapColorScheme },
+                  legend: showLegend ? { orient: legendOrient } : null
+                }
+              : {
+                  field: config.xField,
+                  type: 'nominal',
+                  scale: { scheme: treemapColorScheme },
+                  legend: showLegend ? { orient: legendOrient } : null
+                },
+          },
+        };
+        
+        layers.push(treemapLayer);
+        
+        // Add text labels layer if enabled
+        if (treemapLabels) {
+          const textLayer: any = {
+            mark: { type: 'text', fontSize: 12, color: '#ffffff', fontWeight: 'bold' },
+            encoding: {
+              x: {
+                field: config.xField,
+                type: 'nominal',
+                axis: null,
+              },
+              y: {
+                field: config.yField || config.sizeField,
+                type: 'quantitative',
+                aggregate: 'sum',
+                axis: null,
+                stack: 'zero',
+              },
+              text: { field: config.xField, type: 'nominal' },
+            },
+          };
+          layers.push(textLayer);
+        }
+        
+        return {
+          ...baseSpec,
+          layer: layers,
+        };
+      }
+    }
 
     case 'custom':
       // For custom viz, user builds spec using UI

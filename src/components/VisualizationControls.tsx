@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows, Layers } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows, Layers, LayoutGrid } from 'lucide-react';
 import { CustomVizBuilder, type CustomVizConfig } from './CustomVizBuilder';
 
 
@@ -17,6 +17,7 @@ const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   heatlane: Rows,
   boxplot: Box,
   histogram: BarChart2,
+  treemap: LayoutGrid,
   custom: Layers,
 };
 
@@ -67,6 +68,13 @@ interface VisualizationControlsProps {
   // Custom viz builder
   customVizConfig: CustomVizConfig;
   onCustomVizConfigChange: (config: CustomVizConfig) => void;
+  // Treemap controls
+  treemapNesting: 'flat' | 'nested';
+  onTreemapNestingChange: (nesting: 'flat' | 'nested') => void;
+  treemapColorScheme: 'category10' | 'tableau10' | 'blues' | 'greens' | 'reds' | 'viridis';
+  onTreemapColorSchemeChange: (scheme: 'category10' | 'tableau10' | 'blues' | 'greens' | 'reds' | 'viridis') => void;
+  treemapLabels: boolean;
+  onTreemapLabelsChange: (show: boolean) => void;
 }
 
 export function VisualizationControls({
@@ -113,6 +121,12 @@ export function VisualizationControls({
   onLegendModeChange,
   customVizConfig,
   onCustomVizConfigChange,
+  treemapNesting,
+  onTreemapNestingChange,
+  treemapColorScheme,
+  onTreemapColorSchemeChange,
+  treemapLabels,
+  onTreemapLabelsChange,
 }: VisualizationControlsProps) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -362,6 +376,56 @@ export function VisualizationControls({
               />
             </div>
           )}
+        </>
+      )}
+
+      {vizType === 'treemap' && (
+        <>
+          <div className="space-y-1.5">
+            <Label htmlFor="treemap-nesting" className="text-xs">Nesting Mode</Label>
+            <Select value={treemapNesting} onValueChange={onTreemapNestingChange}>
+              <SelectTrigger id="treemap-nesting" className="h-8 text-sm">
+                <SelectValue placeholder="Select nesting mode" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="flat">Flat - Single level rectangles</SelectItem>
+                <SelectItem value="nested">Nested - Hierarchical layout</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="treemap-color-scheme" className="text-xs">Color Scheme</Label>
+            <Select value={treemapColorScheme} onValueChange={onTreemapColorSchemeChange}>
+              <SelectTrigger id="treemap-color-scheme" className="h-8 text-sm">
+                <SelectValue placeholder="Select color scheme" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="category10">Category 10 (Default)</SelectItem>
+                <SelectItem value="tableau10">Tableau 10</SelectItem>
+                <SelectItem value="blues">Blues</SelectItem>
+                <SelectItem value="greens">Greens</SelectItem>
+                <SelectItem value="reds">Reds</SelectItem>
+                <SelectItem value="viridis">Viridis</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="treemap-labels" className="text-xs">Labels</Label>
+            <Select 
+              value={treemapLabels ? 'show' : 'hide'} 
+              onValueChange={(v) => onTreemapLabelsChange(v === 'show')}
+            >
+              <SelectTrigger id="treemap-labels" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="show">Show labels</SelectItem>
+                <SelectItem value="hide">Hide labels</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </>
       )}
 

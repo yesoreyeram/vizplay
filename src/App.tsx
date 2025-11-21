@@ -69,6 +69,11 @@ function App() {
   // Custom viz builder config for custom visualization type
   const [customVizConfig, setCustomVizConfig] = useState<CustomVizConfig>({ layers: [] });
 
+  // Treemap controls
+  const [treemapNesting, setTreemapNesting] = useState<'flat' | 'nested'>('flat');
+  const [treemapColorScheme, setTreemapColorScheme] = useState<'category10' | 'tableau10' | 'blues' | 'greens' | 'reds' | 'viridis'>('category10');
+  const [treemapLabels, setTreemapLabels] = useState(true);
+
   // Track previous viz type for migration
   const prevVizTypeRef = useRef<string>(vizType);
   const configSnapshotRef = useRef<any>(null);
@@ -97,11 +102,15 @@ function App() {
         referenceLine,
         legendPosition,
         legendMode,
+        treemapNesting,
+        treemapColorScheme,
+        treemapLabels,
       };
     }
   }, [vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation,
       stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient,
-      xField2, showReferenceLine, referenceLine, legendPosition, legendMode]);
+      xField2, showReferenceLine, referenceLine, legendPosition, legendMode, treemapNesting,
+      treemapColorScheme, treemapLabels]);
 
   // Auto-migrate to custom viz when switching from another chart type
   useEffect(() => {
@@ -225,19 +234,22 @@ function App() {
         topN: vizType === 'bar' ? topN : undefined,
         showTextLabels: vizType === 'bar' ? showTextLabels : undefined,
         aggregateOp: vizType === 'bar' ? aggregateOp : undefined,
-        colorGradient: vizType === 'bar' ? colorGradient : undefined,
+        colorGradient: vizType === 'bar' || vizType === 'treemap' ? colorGradient : undefined,
         xField2: vizType === 'bar' && xField2 !== '__none__' ? xField2 : undefined,
         showReferenceLine: vizType === 'bar' ? showReferenceLine : undefined,
         referenceLine: vizType === 'bar' ? referenceLine : undefined,
         legendPosition,
         legendMode,
         customVizConfig: vizType === 'custom' ? customVizConfig : undefined,
+        treemapNesting: vizType === 'treemap' ? treemapNesting : undefined,
+        treemapColorScheme: vizType === 'treemap' ? treemapColorScheme : undefined,
+        treemapLabels: vizType === 'treemap' ? treemapLabels : undefined,
       });
     } catch (error) {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, legendPosition, legendMode, customVizConfig]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, legendPosition, legendMode, customVizConfig, treemapNesting, treemapColorScheme, treemapLabels]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
@@ -328,6 +340,23 @@ function App() {
         setCustomVizConfig({ layers: [] });
       }
       
+      // Treemap options
+      if (dataset.vizConfig?.treemapNesting) {
+        setTreemapNesting(dataset.vizConfig.treemapNesting);
+      } else {
+        setTreemapNesting('flat');
+      }
+      if (dataset.vizConfig?.treemapColorScheme) {
+        setTreemapColorScheme(dataset.vizConfig.treemapColorScheme);
+      } else {
+        setTreemapColorScheme('category10');
+      }
+      if (dataset.vizConfig?.treemapLabels !== undefined) {
+        setTreemapLabels(dataset.vizConfig.treemapLabels);
+      } else {
+        setTreemapLabels(true);
+      }
+      
       // Set fields after a short delay to ensure data is parsed
       setTimeout(() => {
         if (dataset.vizConfig?.xField) setXField(dataset.vizConfig.xField);
@@ -352,6 +381,9 @@ function App() {
       setColorGradient(false);
       setShowReferenceLine(false);
       setReferenceLine(0);
+      setTreemapNesting('flat');
+      setTreemapColorScheme('category10');
+      setTreemapLabels(true);
     }
   };
 
@@ -511,6 +543,12 @@ function App() {
                         onLegendModeChange={setLegendMode}
                         customVizConfig={customVizConfig}
                         onCustomVizConfigChange={setCustomVizConfig}
+                        treemapNesting={treemapNesting}
+                        onTreemapNestingChange={setTreemapNesting}
+                        treemapColorScheme={treemapColorScheme}
+                        onTreemapColorSchemeChange={setTreemapColorScheme}
+                        treemapLabels={treemapLabels}
+                        onTreemapLabelsChange={setTreemapLabels}
                       />
                     </div>
                   </div>

@@ -36,6 +36,9 @@ export function migrateToCustomViz(config: VisualizationConfig): CustomVizConfig
     case 'histogram':
       layers.push(...migrateHistogram(config));
       break;
+    case 'treemap':
+      layers.push(...migrateTreemap(config));
+      break;
     default:
       // For unknown types, create a basic layer
       if (config.xField && config.yField) {
@@ -423,4 +426,84 @@ function migrateHistogram(config: VisualizationConfig): VizLayer[] {
   }
 
   return [layer];
+}
+
+function migrateTreemap(config: VisualizationConfig): VizLayer[] {
+  const layers: VizLayer[] = [];
+  const treemapLabels = config.treemapLabels !== false; // Default to true
+  const treemapColorScheme = config.treemapColorScheme || 'category10';
+
+  // Main rect layer
+  const rectLayer: VizLayer = {
+    id: `layer-treemap-${crypto.randomUUID()}`,
+    mark: 'rect',
+    markOptions: { tooltip: true },
+    encodings: {},
+  };
+
+  if (config.xField) {
+    rectLayer.encodings.x = {
+      field: config.xField,
+      type: 'nominal',
+      axis: { title: null }
+    };
+  }
+
+  if (config.yField || config.sizeField) {
+    rectLayer.encodings.y = {
+      field: config.yField || config.sizeField!,
+      type: 'quantitative',
+      aggregate: 'sum',
+      axis: { title: null }
+    };
+  }
+
+  // Color encoding
+  if (config.colorField && config.colorField !== '__none__') {
+    rectLayer.encodings.color = {
+      field: config.colorField,
+      type: config.colorGradient ? 'quantitative' : 'nominal',
+      scale: { scheme: treemapColorScheme }
+    };
+  } else if (config.xField) {
+    rectLayer.encodings.color = {
+      field: config.xField,
+      type: 'nominal',
+      scale: { scheme: treemapColorScheme }
+    };
+  }
+
+  layers.push(rectLayer);
+
+  // Add text labels layer if enabled
+  if (treemapLabels && config.xField) {
+    const textLayer: VizLayer = {
+      id: `layer-treemap-text-${crypto.randomUUID()}`,
+      mark: 'text',
+      markOptions: {
+        color: '#ffffff',
+      },
+      encodings: {
+        x: {
+          field: config.xField,
+          type: 'nominal',
+          axis: { title: null }
+        },
+        text: { field: config.xField, type: 'nominal' },
+      },
+    };
+
+    if (config.yField || config.sizeField) {
+      textLayer.encodings.y = {
+        field: config.yField || config.sizeField!,
+        type: 'quantitative',
+        aggregate: 'sum',
+        axis: { title: null }
+      };
+    }
+
+    layers.push(textLayer);
+  }
+
+  return layers;
 }
