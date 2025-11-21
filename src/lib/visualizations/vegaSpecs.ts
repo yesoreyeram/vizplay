@@ -554,11 +554,7 @@ export function generateVegaSpec(
             calculate: `datum.${config.yField} + ' (' + datum.percentage + '%)'`,
             as: 'labelText'
           }];
-          if (isHorizontal) {
-            textLayer.encoding.text = { field: 'labelText', type: 'nominal' };
-          } else {
-            textLayer.encoding.text = { field: 'labelText', type: 'nominal' };
-          }
+          textLayer.encoding.text = { field: 'labelText', type: 'nominal' };
         }
         
         layers.push(textLayer);
@@ -593,11 +589,7 @@ export function generateVegaSpec(
           calculate: `'↓ ' + datum.conversionRate + '%'`,
           as: 'conversionText'
         });
-        if (isHorizontal) {
-          conversionLayer.encoding.text = { field: 'conversionText', type: 'nominal' };
-        } else {
-          conversionLayer.encoding.text = { field: 'conversionText', type: 'nominal' };
-        }
+        conversionLayer.encoding.text = { field: 'conversionText', type: 'nominal' };
 
         layers.push(conversionLayer);
       }
