@@ -20,13 +20,18 @@ const initialData = JSON.stringify([
 ], null, 2);
 
 function App() {
-  // Separate data states for manual input and sample dataset
+  // Separate data states for manual input, sample dataset, and file upload
   const [manualInputData, setManualInputData] = useState(initialData);
   const [sampleDatasetData, setSampleDatasetData] = useState('');
-  const [activeDataSource, setActiveDataSource] = useState<'input' | 'samples'>('input');
+  const [uploadedFileData, setUploadedFileData] = useState('');
+  const [activeDataSource, setActiveDataSource] = useState<'input' | 'samples' | 'upload'>('input');
   
   // Use the appropriate data source based on active tab
-  const rawData = activeDataSource === 'input' ? manualInputData : sampleDatasetData;
+  const rawData = activeDataSource === 'input' 
+    ? manualInputData 
+    : activeDataSource === 'samples' 
+      ? sampleDatasetData 
+      : uploadedFileData;
   
   const [dataFormat, setDataFormat] = useState<DataFormat>('json');
   const [jsonataExpression, setJsonataExpression] = useState('');
@@ -136,7 +141,23 @@ function App() {
   };
 
   const handleTabChange = (value: string) => {
-    setActiveDataSource(value as 'input' | 'samples');
+    setActiveDataSource(value as 'input' | 'samples' | 'upload');
+  };
+
+  const handleFileUpload = (content: string, fileName: string) => {
+    setUploadedFileData(content);
+    
+    // Infer format from file extension
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    if (ext === 'json') setDataFormat('json');
+    else if (ext === 'csv') setDataFormat('csv');
+    else if (ext === 'tsv') setDataFormat('tsv');
+    else if (ext === 'xml') setDataFormat('xml');
+    else if (ext === 'yaml' || ext === 'yml') setDataFormat('yaml');
+    
+    setJsonataExpression('');
+    setFieldMappings([]);
+    setChartTitle(`${fileName} Visualization`);
   };
 
   const dataStats = {
@@ -166,6 +187,7 @@ function App() {
                         onChange={handleManualInputChange}
                         onLoadDataset={handleLoadDataset}
                         onTabChange={handleTabChange}
+                        onFileUpload={handleFileUpload}
                       />
                     </div>
                   </div>
