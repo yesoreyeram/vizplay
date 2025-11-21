@@ -31,10 +31,23 @@ export function generateVegaSpec(
     data: { values: data },
     title: config.title || `${config.type} Chart`,
     config: {
-      view: { strokeWidth: 0 },
+      background: '#0a0e1a',
+      view: { strokeWidth: 0, fill: '#0a0e1a' },
       axis: {
         labelFont: 'system-ui',
         titleFont: 'system-ui',
+        labelColor: '#e5e7eb',
+        titleColor: '#e5e7eb',
+        gridColor: '#1f2937',
+        domainColor: '#374151',
+      },
+      title: {
+        color: '#e5e7eb',
+        font: 'system-ui',
+      },
+      legend: {
+        labelColor: '#e5e7eb',
+        titleColor: '#e5e7eb',
       },
     },
   };
