@@ -154,11 +154,33 @@ function migrateBarChart(config: VisualizationConfig): VizLayer[] {
       scale: { scheme: 'blues' }
     };
   } else if (config.colorField && config.colorField !== '__none__') {
-    barLayer.encodings.color = {
+    const colorEncoding: VizLayer['encodings']['color'] = {
       field: config.colorField,
       type: 'nominal',
       scale: { scheme: 'category10' }
     };
+    
+    // Add sorting for stacked/grouped bars to maintain consistent order and colors
+    if ((barStyle === 'stacked' || barStyle === 'grouped') && config.stackSort && config.stackSort !== 'none' && config.yField) {
+      colorEncoding.sort = {
+        op: 'sum',
+        field: config.yField,
+        order: config.stackSort === 'ascending' ? 'ascending' : 'descending'
+      };
+    } else {
+      colorEncoding.sort = null;
+    }
+    
+    barLayer.encodings.color = colorEncoding;
+  }
+
+  // Add xOffset/yOffset for grouped bar charts
+  if (barStyle === 'grouped' && config.colorField && config.colorField !== '__none__') {
+    if (isHorizontal) {
+      barLayer.encodings.yOffset = { field: config.colorField, type: 'nominal' };
+    } else {
+      barLayer.encodings.xOffset = { field: config.colorField, type: 'nominal' };
+    }
   }
 
   layers.push(barLayer);
@@ -177,6 +199,17 @@ function migrateBarChart(config: VisualizationConfig): VizLayer[] {
         text: { field: config.yField, type: 'quantitative' },
       },
     };
+    
+    // Copy offset encodings for grouped charts
+    if (barStyle === 'grouped' && config.colorField && config.colorField !== '__none__') {
+      if (barLayer.encodings.xOffset) {
+        textLayer.encodings.xOffset = { ...barLayer.encodings.xOffset };
+      }
+      if (barLayer.encodings.yOffset) {
+        textLayer.encodings.yOffset = { ...barLayer.encodings.yOffset };
+      }
+    }
+    
     layers.push(textLayer);
   }
 

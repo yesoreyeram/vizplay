@@ -503,6 +503,12 @@ export function generateVegaSpec(
             if (layer.encodings.y) {
               layerSpec.encoding.y = { ...layer.encodings.y };
             }
+            if (layer.encodings.xOffset) {
+              layerSpec.encoding.xOffset = { ...layer.encodings.xOffset };
+            }
+            if (layer.encodings.yOffset) {
+              layerSpec.encoding.yOffset = { ...layer.encodings.yOffset };
+            }
             if (layer.encodings.color) {
               layerSpec.encoding.color = { ...layer.encodings.color };
             }

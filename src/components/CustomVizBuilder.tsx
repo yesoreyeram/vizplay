@@ -20,7 +20,9 @@ export interface VizLayer {
   encodings: {
     x?: { field: string; type: string; aggregate?: string; bin?: boolean; scale?: Record<string, unknown>; axis?: Record<string, unknown> };
     y?: { field: string; type: string; aggregate?: string; bin?: boolean; scale?: Record<string, unknown>; axis?: Record<string, unknown> };
-    color?: { field: string; type: string; scale?: Record<string, unknown>; legend?: Record<string, unknown> };
+    xOffset?: { field: string; type: string };
+    yOffset?: { field: string; type: string };
+    color?: { field: string; type: string; scale?: Record<string, unknown>; legend?: Record<string, unknown>; sort?: Record<string, unknown> | null };
     size?: { field: string; type: string; scale?: Record<string, unknown> };
     opacity?: { field: string; type: string };
     shape?: { field: string; type: string };
