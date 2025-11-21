@@ -432,7 +432,6 @@ export function generateVegaSpec(
       const funnelDirection = config.funnelDirection || 'normal';
       const funnelLabelType = config.funnelLabelType || 'value';
       const funnelShowConversionRate = config.funnelShowConversionRate || false;
-      const funnelGap = config.funnelGap || 0;
 
       // Sort data based on direction
       const sortedData = [...data];
