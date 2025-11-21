@@ -119,6 +119,7 @@ function App() {
       funnelOrientation, funnelDirection, funnelLabelType, funnelShowConversionRate, funnelGap, funnelColorScheme]);
 
   // Auto-migrate to custom viz when switching from another chart type
+  // Also handle funnel-specific behavior
   useEffect(() => {
     const prevVizType = prevVizTypeRef.current;
     
@@ -131,10 +132,16 @@ function App() {
       }
     }
     
+    // When switching TO funnel chart from another type, reset sort to 'none'
+    // This ensures data appears in original order (which is what funnels need)
+    if (vizType === 'funnel' && prevVizType !== 'funnel' && prevVizType !== '') {
+      setXAxisSort('none');
+      setStackSort('none');
+    }
+    
     // Update the previous viz type
     prevVizTypeRef.current = vizType;
   }, [vizType, customVizConfig.layers.length]);
-
 
   // Parse data whenever inputs change
   const parsedData = useMemo(() => {

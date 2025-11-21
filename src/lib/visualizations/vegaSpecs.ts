@@ -638,9 +638,8 @@ export function generateVegaSpec(
             fontWeight: 'bold'
           },
           transform: [
-            { filter: 'datum.order > 0' }, // Skip first item (100%)
             {
-              calculate: `'↓ ' + datum.conversionRate + '%'`,
+              calculate: `datum.order > 0 ? '↓ ' + datum.conversionRate + '%' : ''`,
               as: 'conversionText'
             }
           ],
@@ -653,6 +652,7 @@ export function generateVegaSpec(
             x: { 
               field: config.yField, 
               type: 'quantitative',
+              stack: 'center',  // Match the main layer's stack setting
               scale: { domain: [0, maxValue * 1.1] }
             },
             text: { 
@@ -668,6 +668,7 @@ export function generateVegaSpec(
             y: { 
               field: config.yField, 
               type: 'quantitative',
+              stack: 'center',  // Match the main layer's stack setting
               scale: { domain: [0, maxValue * 1.1] }
             },
             text: { 
