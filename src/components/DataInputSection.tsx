@@ -3,6 +3,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { sampleDatasets } from '@/data/sampleDatasets';
 import type { Dataset } from '@/data/sampleDatasets';
 import { Search, Upload as UploadIcon } from 'lucide-react';
@@ -133,30 +134,31 @@ export function DataInputSection({ value, onChange, onLoadDataset, onTabChange, 
         </TabsContent>
 
         <TabsContent value="samples" className="flex-1 flex flex-col px-3 pb-3 mt-0 overflow-hidden space-y-2">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-            <Input
-              placeholder="Search datasets..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-7 h-7 text-xs"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex gap-1 flex-wrap">
-            {categories.map(category => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="h-6 text-xs px-2"
-              >
-                {category}
-              </Button>
-            ))}
+          {/* Search and Category Filter */}
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+              <Input
+                placeholder="Search datasets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-7 h-7 text-xs"
+              />
+            </div>
+            <div className="w-40">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="h-7 text-xs">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover">
+                  {categories.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Dataset List - Fixed height scrollable */}

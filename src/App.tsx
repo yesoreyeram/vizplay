@@ -38,7 +38,7 @@ function App() {
   const [fieldMappings, setFieldMappings] = useState<FieldMapping[]>([]);
   
   const [vizType, setVizType] = useState('bar');
-  const [barStyle, setBarStyle] = useState<'simple' | 'stacked' | 'grouped'>('simple');
+  const [barStyle, setBarStyle] = useState<'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt' | 'diverging-stacked'>('simple');
   const [xField, setXField] = useState('category');
   const [yField, setYField] = useState('value');
   const [colorField, setColorField] = useState('__none__');
@@ -51,6 +51,18 @@ function App() {
   const [xAxisSort, setXAxisSort] = useState<'none' | 'ascending' | 'descending'>('none');
   const [stackSort, setStackSort] = useState<'none' | 'ascending' | 'descending'>('none');
   const [topN, setTopN] = useState(0); // 0 = no limit
+  
+  // New bar chart options
+  const [showTextLabels, setShowTextLabels] = useState(false);
+  const [aggregateOp, setAggregateOp] = useState<'none' | 'count' | 'sum' | 'average' | 'median' | 'min' | 'max'>('none');
+  const [colorGradient, setColorGradient] = useState(false);
+  const [xField2, setXField2] = useState('__none__'); // For Gantt charts
+  const [showReferenceLine, setShowReferenceLine] = useState(false);
+  const [referenceLine, setReferenceLine] = useState(0);
+  
+  // Legend controls
+  const [legendPosition, setLegendPosition] = useState<'none' | 'left' | 'right' | 'top' | 'bottom'>('right');
+  const [legendMode, setLegendMode] = useState<'inline' | 'table' | 'popup'>('table');
 
   // Parse data whenever inputs change
   const parsedData = useMemo(() => {
@@ -135,12 +147,20 @@ function App() {
         xAxisSort: vizType === 'bar' ? xAxisSort : undefined,
         stackSort: vizType === 'bar' ? stackSort : undefined,
         topN: vizType === 'bar' ? topN : undefined,
+        showTextLabels: vizType === 'bar' ? showTextLabels : undefined,
+        aggregateOp: vizType === 'bar' ? aggregateOp : undefined,
+        colorGradient: vizType === 'bar' ? colorGradient : undefined,
+        xField2: vizType === 'bar' && xField2 !== '__none__' ? xField2 : undefined,
+        showReferenceLine: vizType === 'bar' ? showReferenceLine : undefined,
+        referenceLine: vizType === 'bar' ? referenceLine : undefined,
+        legendPosition,
+        legendMode,
       });
     } catch (error) {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, legendPosition, legendMode]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
@@ -185,6 +205,45 @@ function App() {
         setTopN(0);
       }
       
+      // New bar chart options
+      if (dataset.vizConfig?.showTextLabels !== undefined) {
+        setShowTextLabels(dataset.vizConfig.showTextLabels);
+      } else {
+        setShowTextLabels(false);
+      }
+      if (dataset.vizConfig?.aggregateOp) {
+        setAggregateOp(dataset.vizConfig.aggregateOp);
+      } else {
+        setAggregateOp('none');
+      }
+      if (dataset.vizConfig?.colorGradient !== undefined) {
+        setColorGradient(dataset.vizConfig.colorGradient);
+      } else {
+        setColorGradient(false);
+      }
+      if (dataset.vizConfig?.showReferenceLine !== undefined) {
+        setShowReferenceLine(dataset.vizConfig.showReferenceLine);
+      } else {
+        setShowReferenceLine(false);
+      }
+      if (dataset.vizConfig?.referenceLine !== undefined) {
+        setReferenceLine(dataset.vizConfig.referenceLine);
+      } else {
+        setReferenceLine(0);
+      }
+      
+      // Legend controls
+      if (dataset.vizConfig?.legendPosition) {
+        setLegendPosition(dataset.vizConfig.legendPosition);
+      } else {
+        setLegendPosition('right');
+      }
+      if (dataset.vizConfig?.legendMode) {
+        setLegendMode(dataset.vizConfig.legendMode);
+      } else {
+        setLegendMode('table');
+      }
+      
       // Set fields after a short delay to ensure data is parsed
       setTimeout(() => {
         if (dataset.vizConfig?.xField) setXField(dataset.vizConfig.xField);
@@ -193,6 +252,8 @@ function App() {
         else setColorField('__none__');
         if (dataset.vizConfig?.sizeField) setSizeField(dataset.vizConfig.sizeField);
         else setSizeField('__none__');
+        if (dataset.vizConfig?.xField2) setXField2(dataset.vizConfig.xField2);
+        else setXField2('__none__');
       }, 100);
     } else {
       setChartTitle(`${dataset.name} Visualization`);
@@ -202,6 +263,11 @@ function App() {
       setXAxisSort('none');
       setStackSort('none');
       setTopN(0);
+      setShowTextLabels(false);
+      setAggregateOp('none');
+      setColorGradient(false);
+      setShowReferenceLine(false);
+      setReferenceLine(0);
     }
   };
 
@@ -293,6 +359,22 @@ function App() {
           {/* Right Panel - Visualization */}
           <Panel defaultSize={50} minSize={30}>
             <PanelGroup direction="vertical">
+              {/* Visualization Render */}
+              <Panel defaultSize={65} minSize={30}>
+                <div className="h-full">
+                  <div className="h-full flex flex-col">
+                    <div className="border-b p-2.5">
+                      <h2 className="font-semibold text-sm">Visualization Output</h2>
+                    </div>
+                    <div className="flex-1 overflow-hidden bg-card">
+                      <VisualizationRender spec={vegaSpec} />
+                    </div>
+                  </div>
+                </div>
+              </Panel>
+              
+              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
+              
               {/* Visualization Controls */}
               <Panel defaultSize={35} minSize={20}>
                 <div className="h-full">
@@ -327,23 +409,23 @@ function App() {
                         onStackSortChange={setStackSort}
                         topN={topN}
                         onTopNChange={setTopN}
+                        showTextLabels={showTextLabels}
+                        onShowTextLabelsChange={setShowTextLabels}
+                        aggregateOp={aggregateOp}
+                        onAggregateOpChange={setAggregateOp}
+                        colorGradient={colorGradient}
+                        onColorGradientChange={setColorGradient}
+                        xField2={xField2}
+                        onXField2Change={setXField2}
+                        showReferenceLine={showReferenceLine}
+                        onShowReferenceLineChange={setShowReferenceLine}
+                        referenceLine={referenceLine}
+                        onReferenceLineChange={setReferenceLine}
+                        legendPosition={legendPosition}
+                        onLegendPositionChange={setLegendPosition}
+                        legendMode={legendMode}
+                        onLegendModeChange={setLegendMode}
                       />
-                    </div>
-                  </div>
-                </div>
-              </Panel>
-              
-              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
-              
-              {/* Visualization Render */}
-              <Panel defaultSize={65} minSize={30}>
-                <div className="h-full">
-                  <div className="h-full flex flex-col">
-                    <div className="border-b p-2.5">
-                      <h2 className="font-semibold text-sm">Visualization Output</h2>
-                    </div>
-                    <div className="flex-1 overflow-hidden bg-card">
-                      <VisualizationRender spec={vegaSpec} />
                     </div>
                   </div>
                 </div>
