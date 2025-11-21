@@ -498,7 +498,7 @@ export function generateVegaSpec(
           y: { 
             field: config.xField, 
             type: 'nominal',
-            sort: { field: 'order', order: 'ascending' },
+            sort: null,  // Use data order (already sorted in processedData)
             axis: { 
               title: config.xField,
               labelAlign: 'right',
@@ -529,7 +529,7 @@ export function generateVegaSpec(
           x: { 
             field: config.xField, 
             type: 'nominal',
-            sort: { field: 'order', order: 'ascending' },
+            sort: null,  // Use data order (already sorted in processedData)
             axis: { 
               title: config.xField, 
               labelAngle: -45,
@@ -576,7 +576,7 @@ export function generateVegaSpec(
             y: { 
               field: config.xField, 
               type: 'nominal', 
-              sort: { field: 'order', order: 'ascending' } 
+              sort: null  // Use data order
             },
             x: { 
               field: config.yField, 
@@ -594,7 +594,7 @@ export function generateVegaSpec(
             x: { 
               field: config.xField, 
               type: 'nominal', 
-              sort: { field: 'order', order: 'ascending' } 
+              sort: null  // Use data order
             },
             y: { 
               field: config.yField, 
@@ -647,7 +647,7 @@ export function generateVegaSpec(
             y: { 
               field: config.xField, 
               type: 'nominal', 
-              sort: { field: 'order', order: 'ascending' } 
+              sort: null  // Use data order
             },
             x: { 
               field: config.yField, 
@@ -663,7 +663,7 @@ export function generateVegaSpec(
             x: { 
               field: config.xField, 
               type: 'nominal', 
-              sort: { field: 'order', order: 'ascending' } 
+              sort: null  // Use data order
             },
             y: { 
               field: config.yField, 
