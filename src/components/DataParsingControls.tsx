@@ -43,14 +43,14 @@ export function DataParsingControls({
   };
 
   return (
-    <div className="h-full flex flex-col p-4 space-y-4 overflow-y-auto">
-      <div className="space-y-2">
-        <Label htmlFor="data-format">Data Format</Label>
+    <div className="h-full flex flex-col p-3 space-y-3 overflow-y-auto">
+      <div className="space-y-1.5">
+        <Label htmlFor="data-format" className="text-xs">Data Format</Label>
         <Select value={format} onValueChange={(value) => onFormatChange(value as DataFormat)}>
-          <SelectTrigger id="data-format">
+          <SelectTrigger id="data-format" className="h-8 text-sm">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-popover">
             <SelectItem value="json">JSON</SelectItem>
             <SelectItem value="csv">CSV</SelectItem>
             <SelectItem value="tsv">TSV</SelectItem>
@@ -60,29 +60,29 @@ export function DataParsingControls({
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="jsonata-expression">JSONata Expression (optional)</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="jsonata-expression" className="text-xs">JSONata Expression (optional)</Label>
         <Textarea
           id="jsonata-expression"
           value={jsonataExpression}
           onChange={(e) => onJsonataChange(e.target.value)}
           placeholder="e.g., $[price > 100]"
-          className="font-mono text-sm h-20 resize-none"
+          className="font-mono text-xs h-16 resize-none"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground leading-tight">
           Transform your data using JSONata query expressions
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label>Field Type Mappings</Label>
-        <div className="space-y-2">
+      <div className="space-y-1.5">
+        <Label className="text-xs">Field Type Mappings</Label>
+        <div className="space-y-1.5">
           {fieldMappings.map((mapping, index) => (
-            <div key={index} className="flex items-center gap-2">
+            <div key={index} className="flex items-center gap-1.5">
               <Input
                 value={mapping.field}
                 readOnly
-                className="flex-1 text-sm"
+                className="flex-1 text-xs h-7"
               />
               <Select
                 value={mapping.type}
@@ -92,10 +92,10 @@ export function DataParsingControls({
                   onFieldMappingsChange(newMappings);
                 }}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-28 h-7 text-xs">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover">
                   <SelectItem value="string">String</SelectItem>
                   <SelectItem value="number">Number</SelectItem>
                   <SelectItem value="boolean">Boolean</SelectItem>
@@ -109,14 +109,15 @@ export function DataParsingControls({
                 variant="ghost"
                 size="icon"
                 onClick={() => removeFieldMapping(index)}
+                className="h-7 w-7"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
               </Button>
             </div>
           ))}
         </div>
 
-        <div className="flex items-end gap-2 pt-2">
+        <div className="flex items-end gap-1.5 pt-1.5">
           <div className="flex-1 space-y-1">
             <Label htmlFor="new-field" className="text-xs">Field Name</Label>
             <Input
@@ -124,7 +125,7 @@ export function DataParsingControls({
               value={newFieldName}
               onChange={(e) => setNewFieldName(e.target.value)}
               placeholder="Field name"
-              className="text-sm"
+              className="text-xs h-7"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -133,13 +134,13 @@ export function DataParsingControls({
               }}
             />
           </div>
-          <div className="w-32 space-y-1">
+          <div className="w-28 space-y-1">
             <Label htmlFor="new-type" className="text-xs">Type</Label>
             <Select value={newFieldType} onValueChange={(value) => setNewFieldType(value as FieldType)}>
-              <SelectTrigger id="new-type">
+              <SelectTrigger id="new-type" className="h-7 text-xs">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover">
                 <SelectItem value="string">String</SelectItem>
                 <SelectItem value="number">Number</SelectItem>
                 <SelectItem value="boolean">Boolean</SelectItem>
@@ -150,8 +151,8 @@ export function DataParsingControls({
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={addFieldMapping} size="icon">
-            <Plus className="h-4 w-4" />
+          <Button onClick={addFieldMapping} size="icon" className="h-7 w-7">
+            <Plus className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>

@@ -119,8 +119,8 @@ function App() {
               <Panel defaultSize={60} minSize={20}>
                 <div className="h-full border-r">
                   <div className="h-full flex flex-col">
-                    <div className="border-b p-4 flex items-center justify-between">
-                      <h2 className="font-semibold">Data Input</h2>
+                    <div className="border-b p-2.5 flex items-center justify-between">
+                      <h2 className="font-semibold text-sm">Data Input</h2>
                       <DatasetDialog onLoadDataset={handleLoadDataset} />
                     </div>
                     <div className="flex-1 overflow-hidden">
@@ -136,8 +136,8 @@ function App() {
               <Panel defaultSize={40} minSize={20}>
                 <div className="h-full border-r">
                   <div className="h-full flex flex-col">
-                    <div className="border-b p-4">
-                      <h2 className="font-semibold">Data Parsing</h2>
+                    <div className="border-b p-2.5">
+                      <h2 className="font-semibold text-sm">Data Parsing</h2>
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <DataParsingControls
@@ -164,8 +164,8 @@ function App() {
               <Panel defaultSize={35} minSize={20}>
                 <div className="h-full">
                   <div className="h-full flex flex-col">
-                    <div className="border-b p-4">
-                      <h2 className="font-semibold">Visualization Settings</h2>
+                    <div className="border-b p-2.5">
+                      <h2 className="font-semibold text-sm">Visualization Settings</h2>
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <VisualizationControls
@@ -194,8 +194,8 @@ function App() {
               <Panel defaultSize={65} minSize={30}>
                 <div className="h-full">
                   <div className="h-full flex flex-col">
-                    <div className="border-b p-4">
-                      <h2 className="font-semibold">Visualization Output</h2>
+                    <div className="border-b p-2.5">
+                      <h2 className="font-semibold text-sm">Visualization Output</h2>
                     </div>
                     <div className="flex-1 overflow-hidden bg-card">
                       <VisualizationRender spec={vegaSpec} />
