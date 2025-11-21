@@ -15,12 +15,18 @@ export interface Dataset {
     colorField?: string;
     sizeField?: string;
     title?: string;
-    barStyle?: 'simple' | 'stacked' | 'grouped';
+    barStyle?: 'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt';
     barOrientation?: 'vertical' | 'horizontal';
     stackNormalize?: boolean;
     xAxisSort?: 'none' | 'ascending' | 'descending';
     stackSort?: 'none' | 'ascending' | 'descending';
     topN?: number;
+    showTextLabels?: boolean;
+    aggregateOp?: 'none' | 'count' | 'sum' | 'average' | 'median' | 'min' | 'max';
+    colorGradient?: boolean;
+    xField2?: string;
+    showReferenceLine?: boolean;
+    referenceLine?: number;
   };
 }
 
@@ -426,6 +432,185 @@ export const sampleDatasets: Dataset[] = [
       xField: 'age',
       yField: '__count__',
       title: 'Age Distribution of Customers',
+    }
+  },
+  {
+    id: 'viz-bar-with-labels',
+    name: '📊 Bar Chart with Text Labels',
+    description: 'Sales data with values displayed on bars - makes exact values easy to read',
+    category: 'Visualization Examples',
+    tags: ['bar-chart', 'text-labels', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { product: 'Laptop', sales: 45000 },
+      { product: 'Phone', sales: 78000 },
+      { product: 'Tablet', sales: 32000 },
+      { product: 'Monitor', sales: 18000 },
+      { product: 'Keyboard', sales: 8500 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'product',
+      yField: 'sales',
+      title: 'Product Sales with Labels',
+      barStyle: 'simple',
+      showTextLabels: true,
+    }
+  },
+  {
+    id: 'viz-diverging-bar',
+    name: '📊 Diverging Bar Chart',
+    description: 'Profit/loss by department - positive and negative values with different colors',
+    category: 'Visualization Examples',
+    tags: ['diverging-bar', 'positive-negative', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { department: 'Sales', profit: 125000 },
+      { department: 'Marketing', profit: -45000 },
+      { department: 'Engineering', profit: 85000 },
+      { department: 'Support', profit: 32000 },
+      { department: 'R&D', profit: -28000 },
+      { department: 'Operations', profit: 62000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'department',
+      yField: 'profit',
+      title: 'Department Profit/Loss',
+      barStyle: 'diverging',
+      barOrientation: 'horizontal',
+    }
+  },
+  {
+    id: 'viz-gantt-chart',
+    name: '📊 Gantt Chart (Time Ranges)',
+    description: 'Project timeline with start and end dates - ideal for project management',
+    category: 'Visualization Examples',
+    tags: ['gantt', 'timeline', 'ranges', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { task: 'Planning', start: 0, end: 5, phase: 'Phase 1' },
+      { task: 'Design', start: 4, end: 12, phase: 'Phase 1' },
+      { task: 'Development', start: 10, end: 25, phase: 'Phase 2' },
+      { task: 'Testing', start: 22, end: 30, phase: 'Phase 2' },
+      { task: 'Deployment', start: 28, end: 35, phase: 'Phase 3' },
+      { task: 'Maintenance', start: 34, end: 45, phase: 'Phase 3' },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'task',
+      yField: 'start',
+      xField2: 'end',
+      colorField: 'phase',
+      title: 'Project Timeline',
+      barStyle: 'gantt',
+    }
+  },
+  {
+    id: 'viz-gradient-bar',
+    name: '📊 Gradient Color Bar Chart',
+    description: 'Temperature data with gradient coloring by value - visual heat representation',
+    category: 'Visualization Examples',
+    tags: ['gradient-bar', 'color-scale', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { city: 'Phoenix', temperature: 106 },
+      { city: 'Las Vegas', temperature: 104 },
+      { city: 'Miami', temperature: 92 },
+      { city: 'Dallas', temperature: 88 },
+      { city: 'Atlanta', temperature: 85 },
+      { city: 'New York', temperature: 78 },
+      { city: 'Seattle', temperature: 72 },
+      { city: 'Portland', temperature: 70 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'city',
+      yField: 'temperature',
+      title: 'Temperature by City',
+      barStyle: 'simple',
+      colorGradient: true,
+      xAxisSort: 'descending',
+    }
+  },
+  {
+    id: 'viz-bar-with-reference',
+    name: '📊 Bar Chart with Reference Line',
+    description: 'Sales performance with target line - easily see above/below target',
+    category: 'Visualization Examples',
+    tags: ['reference-line', 'target', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { month: 'Jan', sales: 45000 },
+      { month: 'Feb', sales: 52000 },
+      { month: 'Mar', sales: 48000 },
+      { month: 'Apr', sales: 61000 },
+      { month: 'May', sales: 58000 },
+      { month: 'Jun', sales: 55000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'month',
+      yField: 'sales',
+      title: 'Monthly Sales vs Target',
+      barStyle: 'simple',
+      showReferenceLine: true,
+      referenceLine: 50000,
+    }
+  },
+  {
+    id: 'viz-aggregate-count',
+    name: '📊 Count Aggregation Bar Chart',
+    description: 'Category frequency using count aggregation - no pre-aggregated data needed',
+    category: 'Visualization Examples',
+    tags: ['aggregate', 'count', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { category: 'Electronics', item: 'Item1' },
+      { category: 'Electronics', item: 'Item2' },
+      { category: 'Electronics', item: 'Item3' },
+      { category: 'Clothing', item: 'Item4' },
+      { category: 'Clothing', item: 'Item5' },
+      { category: 'Food', item: 'Item6' },
+      { category: 'Food', item: 'Item7' },
+      { category: 'Food', item: 'Item8' },
+      { category: 'Food', item: 'Item9' },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'category',
+      yField: 'item',
+      title: 'Item Count by Category',
+      barStyle: 'simple',
+      aggregateOp: 'count',
+    }
+  },
+  {
+    id: 'viz-aggregate-average',
+    name: '📊 Average Aggregation Bar Chart',
+    description: 'Average price by category using mean aggregation',
+    category: 'Visualization Examples',
+    tags: ['aggregate', 'average', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { category: 'Electronics', price: 599 },
+      { category: 'Electronics', price: 899 },
+      { category: 'Electronics', price: 1299 },
+      { category: 'Clothing', price: 49 },
+      { category: 'Clothing', price: 79 },
+      { category: 'Clothing', price: 39 },
+      { category: 'Food', price: 12 },
+      { category: 'Food', price: 18 },
+      { category: 'Food', price: 25 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'category',
+      yField: 'price',
+      title: 'Average Price by Category',
+      barStyle: 'simple',
+      aggregateOp: 'average',
+      showTextLabels: true,
     }
   },
 
