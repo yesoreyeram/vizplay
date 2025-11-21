@@ -1,4 +1,5 @@
 import type { TopLevelSpec } from 'vega-lite';
+import type { CustomVizConfig } from '@/components/CustomVizBuilder';
 
 export interface VisualizationConfig {
   type: string;
@@ -23,6 +24,8 @@ export interface VisualizationConfig {
   // Legend controls
   legendPosition?: 'none' | 'left' | 'right' | 'top' | 'bottom';
   legendMode?: 'inline' | 'table' | 'popup';
+  // Custom viz builder config
+  customVizConfig?: CustomVizConfig;
 }
 
 export const visualizationTypes = [
@@ -35,6 +38,7 @@ export const visualizationTypes = [
   { id: 'heatlane', name: 'Heat Lane', description: 'Show categorical data with color intensity' },
   { id: 'boxplot', name: 'Box Plot', description: 'Show distribution statistics' },
   { id: 'histogram', name: 'Histogram', description: 'Show frequency distribution' },
+  { id: 'custom', name: 'Custom Vega-Lite', description: 'Advanced custom visualization with full Vega-Lite spec control' },
 ];
 
 export function generateVegaSpec(
@@ -480,6 +484,82 @@ export function generateVegaSpec(
           },
           y: { aggregate: 'count', type: 'quantitative' },
         },
+      };
+
+    case 'custom':
+      // For custom viz, user builds spec using UI
+      if (config.customVizConfig && config.customVizConfig.layers.length > 0) {
+        try {
+          const layers = config.customVizConfig.layers.map((layer: any) => {
+            const layerSpec: any = {
+              mark: layer.markOptions ? { type: layer.mark, ...layer.markOptions } : layer.mark,
+              encoding: {},
+            };
+
+            // Build encodings
+            if (layer.encodings.x) {
+              layerSpec.encoding.x = { ...layer.encodings.x };
+            }
+            if (layer.encodings.y) {
+              layerSpec.encoding.y = { ...layer.encodings.y };
+            }
+            if (layer.encodings.color) {
+              layerSpec.encoding.color = { ...layer.encodings.color };
+            }
+            if (layer.encodings.size) {
+              layerSpec.encoding.size = { ...layer.encodings.size };
+            }
+            if (layer.encodings.opacity) {
+              layerSpec.encoding.opacity = { ...layer.encodings.opacity };
+            }
+            if (layer.encodings.shape) {
+              layerSpec.encoding.shape = { ...layer.encodings.shape };
+            }
+            if (layer.encodings.text) {
+              layerSpec.encoding.text = { ...layer.encodings.text };
+            }
+            if (layer.encodings.tooltip) {
+              layerSpec.encoding.tooltip = layer.encodings.tooltip;
+            }
+
+            // Add transforms if any
+            if (layer.transform && layer.transform.length > 0) {
+              layerSpec.transform = layer.transform;
+            }
+
+            return layerSpec;
+          });
+
+          // If single layer, use it directly; if multiple, use layer composition
+          if (layers.length === 1) {
+            return {
+              ...baseSpec,
+              ...layers[0],
+            };
+          } else {
+            return {
+              ...baseSpec,
+              layer: layers,
+            };
+          }
+        } catch (error) {
+          console.error('Error building custom viz spec:', error);
+          return {
+            ...baseSpec,
+            mark: { type: 'text', fontSize: 14 },
+            encoding: {
+              text: { value: 'Error building custom visualization. Please check your configuration.' }
+            }
+          };
+        }
+      }
+      // Default template for custom viz when no layers configured
+      return {
+        ...baseSpec,
+        mark: { type: 'text', fontSize: 16 },
+        encoding: {
+          text: { value: 'Add layers to build your custom visualization' }
+        }
       };
 
     default:
