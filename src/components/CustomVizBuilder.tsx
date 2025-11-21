@@ -207,16 +207,23 @@ export function CustomVizBuilder({ config, onChange, availableFields }: CustomVi
                     <div>
                       <Label className="text-xs">Field</Label>
                       <Select
-                        value={layer.encodings.x?.field || ''}
+                        value={layer.encodings.x?.field || '__none__'}
                         onValueChange={(field) => {
-                          const current = layer.encodings.x || { type: 'nominal' };
-                          updateLayerEncoding(layer.id, 'x', { ...current, field });
+                          if (field === '__none__') {
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                            const { x: _removed, ...rest } = layer.encodings;
+                            updateLayer(layer.id, { encodings: rest });
+                          } else {
+                            const current = layer.encodings.x || { type: 'nominal' };
+                            updateLayerEncoding(layer.id, 'x', { ...current, field });
+                          }
                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select field" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="__none__">None</SelectItem>
                           {availableFields.map(field => (
                             <SelectItem key={field} value={field}>{field}</SelectItem>
                           ))}
@@ -277,16 +284,23 @@ export function CustomVizBuilder({ config, onChange, availableFields }: CustomVi
                     <div>
                       <Label className="text-xs">Field</Label>
                       <Select
-                        value={layer.encodings.y?.field || ''}
+                        value={layer.encodings.y?.field || '__none__'}
                         onValueChange={(field) => {
-                          const current = layer.encodings.y || { type: 'quantitative' };
-                          updateLayerEncoding(layer.id, 'y', { ...current, field });
+                          if (field === '__none__') {
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                            const { y: _removed, ...rest } = layer.encodings;
+                            updateLayer(layer.id, { encodings: rest });
+                          } else {
+                            const current = layer.encodings.y || { type: 'quantitative' };
+                            updateLayerEncoding(layer.id, 'y', { ...current, field });
+                          }
                         }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select field" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="__none__">None</SelectItem>
                           {availableFields.map(field => (
                             <SelectItem key={field} value={field}>{field}</SelectItem>
                           ))}
@@ -347,9 +361,9 @@ export function CustomVizBuilder({ config, onChange, availableFields }: CustomVi
                     <div>
                       <Label className="text-xs">Field</Label>
                       <Select
-                        value={layer.encodings.color?.field || ''}
+                        value={layer.encodings.color?.field || '__none__'}
                         onValueChange={(field) => {
-                          if (field === '') {
+                          if (field === '__none__') {
                             // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             const { color: _removed, ...rest } = layer.encodings;
                             updateLayer(layer.id, { encodings: rest });
@@ -363,7 +377,7 @@ export function CustomVizBuilder({ config, onChange, availableFields }: CustomVi
                           <SelectValue placeholder="None" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="__none__">None</SelectItem>
                           {availableFields.map(field => (
                             <SelectItem key={field} value={field}>{field}</SelectItem>
                           ))}
@@ -401,9 +415,9 @@ export function CustomVizBuilder({ config, onChange, availableFields }: CustomVi
                     <div>
                       <Label className="text-xs">Field</Label>
                       <Select
-                        value={layer.encodings.size?.field || ''}
+                        value={layer.encodings.size?.field || '__none__'}
                         onValueChange={(field) => {
-                          if (field === '') {
+                          if (field === '__none__') {
                             // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             const { size: _removed, ...rest } = layer.encodings;
                             updateLayer(layer.id, { encodings: rest });
@@ -417,7 +431,7 @@ export function CustomVizBuilder({ config, onChange, availableFields }: CustomVi
                           <SelectValue placeholder="None" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="__none__">None</SelectItem>
                           {availableFields.map(field => (
                             <SelectItem key={field} value={field}>{field}</SelectItem>
                           ))}

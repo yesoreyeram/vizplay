@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows, Code } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows, Layers } from 'lucide-react';
 import { CustomVizBuilder, type CustomVizConfig } from './CustomVizBuilder';
 
 
@@ -17,7 +17,7 @@ const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   heatlane: Rows,
   boxplot: Box,
   histogram: BarChart2,
-  custom: Code,
+  custom: Layers,
 };
 
 interface VisualizationControlsProps {
