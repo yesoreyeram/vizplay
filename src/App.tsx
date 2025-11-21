@@ -232,6 +232,18 @@ function App() {
         setReferenceLine(0);
       }
       
+      // Legend controls
+      if (dataset.vizConfig?.legendPosition) {
+        setLegendPosition(dataset.vizConfig.legendPosition);
+      } else {
+        setLegendPosition('right');
+      }
+      if (dataset.vizConfig?.legendMode) {
+        setLegendMode(dataset.vizConfig.legendMode);
+      } else {
+        setLegendMode('table');
+      }
+      
       // Set fields after a short delay to ensure data is parsed
       setTimeout(() => {
         if (dataset.vizConfig?.xField) setXField(dataset.vizConfig.xField);

@@ -433,21 +433,23 @@ export function generateVegaSpec(
 
     case 'heatlane':
       // Heat lane chart - horizontal lanes with color intensity
+      // Requires a quantitative field for color encoding
+      const colorFieldForHeat = config.colorField && config.colorField !== '__none__' ? config.colorField : config.sizeField;
       return {
         ...baseSpec,
         mark: { type: 'rect', tooltip: true },
         encoding: {
           y: { field: config.xField, type: 'nominal', axis: { title: config.xField } },
           x: { field: config.yField, type: 'ordinal', axis: { labelAngle: 0, title: config.yField } },
-          color: { 
-            field: config.colorField || config.yField, 
+          color: colorFieldForHeat ? { 
+            field: colorFieldForHeat, 
             type: 'quantitative', 
             scale: { scheme: 'redyellowgreen', reverse: false },
             legend: showLegend ? { 
               orient: legendOrient,
               title: 'Intensity'
             } : null
-          },
+          } : { value: '#60a5fa' },
         },
         config: {
           ...baseSpec.config,
