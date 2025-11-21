@@ -2018,5 +2018,433 @@ export const sampleDatasets: Dataset[] = [
       },
     },
   },
+  {
+    id: 'custom-lollipop-chart',
+    name: '🎨 Lollipop Chart',
+    description: 'Custom viz using circle + rule marks for lollipop effect',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'lollipop', 'creative', 'comparison'],
+    format: 'json',
+    data: JSON.stringify([
+      { category: 'Design', score: 87 },
+      { category: 'Development', score: 92 },
+      { category: 'Marketing', score: 78 },
+      { category: 'Sales', score: 85 },
+      { category: 'Support', score: 91 },
+      { category: 'Operations', score: 82 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Department Performance Scores (Lollipop)',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-stems',
+            mark: 'rule',
+            markOptions: { tooltip: false, color: '#94a3b8', size: 2 },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'score', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-dots',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 200, color: '#8b5cf6' },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'score', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-waterfall-chart',
+    name: '🎨 Waterfall Chart',
+    description: 'Custom viz showing cumulative effects with bars',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'waterfall', 'financial', 'cumulative'],
+    format: 'json',
+    data: JSON.stringify([
+      { stage: 'Starting Balance', amount: 100000, cumulative: 100000, type: 'start' },
+      { stage: 'Revenue', amount: 45000, cumulative: 145000, type: 'increase' },
+      { stage: 'Cost of Goods', amount: -18000, cumulative: 127000, type: 'decrease' },
+      { stage: 'Operating Expenses', amount: -22000, cumulative: 105000, type: 'decrease' },
+      { stage: 'Marketing', amount: -8000, cumulative: 97000, type: 'decrease' },
+      { stage: 'Ending Balance', amount: 97000, cumulative: 97000, type: 'end' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Cash Flow Waterfall Analysis',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-bars',
+            mark: 'bar',
+            markOptions: { tooltip: true },
+            encodings: {
+              x: { field: 'stage', type: 'ordinal' },
+              y: { field: 'cumulative', type: 'quantitative' },
+              color: { field: 'type', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-slope-chart',
+    name: '🎨 Slope Chart',
+    description: 'Custom viz showing change between two time points',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'slope', 'trend', 'comparison'],
+    format: 'json',
+    data: JSON.stringify([
+      { product: 'Product A', period: '2022', value: 45 },
+      { product: 'Product A', period: '2023', value: 62 },
+      { product: 'Product B', period: '2022', value: 78 },
+      { product: 'Product B', period: '2023', value: 71 },
+      { product: 'Product C', period: '2022', value: 52 },
+      { product: 'Product C', period: '2023', value: 85 },
+      { product: 'Product D', period: '2022', value: 91 },
+      { product: 'Product D', period: '2023', value: 95 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Product Performance Change (Slope Chart)',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-lines',
+            mark: 'line',
+            markOptions: { tooltip: true, size: 3 },
+            encodings: {
+              x: { field: 'period', type: 'ordinal' },
+              y: { field: 'value', type: 'quantitative' },
+              color: { field: 'product', type: 'nominal' },
+            },
+          },
+          {
+            id: 'layer-points',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 100 },
+            encodings: {
+              x: { field: 'period', type: 'ordinal' },
+              y: { field: 'value', type: 'quantitative' },
+              color: { field: 'product', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-connected-scatter',
+    name: '🎨 Connected Scatter Plot',
+    description: 'Custom viz with points connected by lines showing progression',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'scatter', 'connected', 'progression'],
+    format: 'json',
+    data: JSON.stringify([
+      { month: 'Jan', revenue: 45000, profit: 12000, efficiency: 26.7 },
+      { month: 'Feb', revenue: 52000, profit: 15000, efficiency: 28.8 },
+      { month: 'Mar', revenue: 48000, profit: 13500, efficiency: 28.1 },
+      { month: 'Apr', revenue: 61000, profit: 19000, efficiency: 31.1 },
+      { month: 'May', revenue: 69000, profit: 22000, efficiency: 31.9 },
+      { month: 'Jun', revenue: 72000, profit: 24000, efficiency: 33.3 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Revenue vs Profit Progression',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-path',
+            mark: 'line',
+            markOptions: { tooltip: false, color: '#94a3b8', size: 2 },
+            encodings: {
+              x: { field: 'revenue', type: 'quantitative' },
+              y: { field: 'profit', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-points',
+            mark: 'circle',
+            markOptions: { tooltip: true, opacity: 0.9 },
+            encodings: {
+              x: { field: 'revenue', type: 'quantitative' },
+              y: { field: 'profit', type: 'quantitative' },
+              size: { field: 'efficiency', type: 'quantitative' },
+              color: { field: 'month', type: 'ordinal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-ranged-dots',
+    name: '🎨 Ranged Dot Plot',
+    description: 'Custom viz showing ranges with min/max dots and connecting lines',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'range', 'dots', 'comparison'],
+    format: 'json',
+    data: JSON.stringify([
+      { category: 'Q1', min: 35, max: 87, avg: 61 },
+      { category: 'Q2', min: 42, max: 92, avg: 67 },
+      { category: 'Q3', min: 38, max: 85, avg: 62 },
+      { category: 'Q4', min: 45, max: 95, avg: 70 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Quarterly Performance Range',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-min-points',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 100, color: '#ef4444' },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'min', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-max-points',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 100, color: '#10b981' },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'max', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-avg-points',
+            mark: 'square',
+            markOptions: { tooltip: true, size: 150, color: '#3b82f6' },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'avg', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-bullet-chart',
+    name: '🎨 Bullet Chart',
+    description: 'Custom viz combining bars and rules for KPI visualization',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'bullet', 'kpi', 'performance'],
+    format: 'json',
+    data: JSON.stringify([
+      { metric: 'Sales', actual: 85, target: 100, poor: 60, satisfactory: 80, good: 100 },
+      { metric: 'Profit', actual: 72, target: 80, poor: 50, satisfactory: 70, good: 90 },
+      { metric: 'Customer Sat', actual: 91, target: 85, poor: 70, satisfactory: 85, good: 95 },
+      { metric: 'Efficiency', actual: 78, target: 90, poor: 65, satisfactory: 85, good: 100 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'KPI Performance Bullet Chart',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-actual',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#3b82f6', opacity: 0.8 },
+            encodings: {
+              x: { field: 'actual', type: 'quantitative' },
+              y: { field: 'metric', type: 'nominal' },
+            },
+          },
+          {
+            id: 'layer-target',
+            mark: 'tick',
+            markOptions: { tooltip: true, color: '#ef4444', size: 3 },
+            encodings: {
+              x: { field: 'target', type: 'quantitative' },
+              y: { field: 'metric', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-funnel-chart',
+    name: '🎨 Funnel Chart',
+    description: 'Custom viz showing conversion funnel with decreasing bars',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'funnel', 'conversion', 'sales'],
+    format: 'json',
+    data: JSON.stringify([
+      { stage: '1. Website Visitors', count: 10000, rate: 100 },
+      { stage: '2. Product Views', count: 5000, rate: 50 },
+      { stage: '3. Add to Cart', count: 1500, rate: 15 },
+      { stage: '4. Checkout', count: 750, rate: 7.5 },
+      { stage: '5. Purchase', count: 500, rate: 5 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Sales Funnel Conversion',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-funnel',
+            mark: 'bar',
+            markOptions: { tooltip: true },
+            encodings: {
+              x: { field: 'count', type: 'quantitative' },
+              y: { field: 'stage', type: 'ordinal' },
+              color: { field: 'rate', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-dumbbell-chart',
+    name: '🎨 Dumbbell Chart',
+    description: 'Custom viz showing before/after comparison with connecting lines',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'dumbbell', 'comparison', 'change'],
+    format: 'json',
+    data: JSON.stringify([
+      { department: 'Engineering', before: 45, after: 62 },
+      { department: 'Sales', before: 78, after: 85 },
+      { department: 'Marketing', before: 52, after: 71 },
+      { department: 'Support', before: 88, after: 92 },
+      { department: 'Operations', before: 65, after: 58 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Department Satisfaction: Before vs After',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-before',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 150, color: '#ef4444' },
+            encodings: {
+              x: { field: 'before', type: 'quantitative' },
+              y: { field: 'department', type: 'nominal' },
+            },
+          },
+          {
+            id: 'layer-after',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 150, color: '#10b981' },
+            encodings: {
+              x: { field: 'after', type: 'quantitative' },
+              y: { field: 'department', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-horizon-chart',
+    name: '🎨 Horizon Chart Style',
+    description: 'Custom viz with layered areas for compact time series',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'horizon', 'time-series', 'compact'],
+    format: 'json',
+    data: JSON.stringify([
+      { month: 'Jan', value: 23, band: 'low' },
+      { month: 'Feb', value: 45, band: 'medium' },
+      { month: 'Mar', value: 67, band: 'high' },
+      { month: 'Apr', value: 89, band: 'high' },
+      { month: 'May', value: 56, band: 'medium' },
+      { month: 'Jun', value: 34, band: 'medium' },
+      { month: 'Jul', value: 78, band: 'high' },
+      { month: 'Aug', value: 91, band: 'high' },
+      { month: 'Sep', value: 42, band: 'medium' },
+      { month: 'Oct', value: 65, band: 'high' },
+      { month: 'Nov', value: 28, band: 'low' },
+      { month: 'Dec', value: 51, band: 'medium' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Performance Horizon Chart',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-area',
+            mark: 'area',
+            markOptions: { tooltip: true, opacity: 0.6 },
+            encodings: {
+              x: { field: 'month', type: 'ordinal' },
+              y: { field: 'value', type: 'quantitative' },
+              color: { field: 'band', type: 'nominal' },
+            },
+          },
+          {
+            id: 'layer-line',
+            mark: 'line',
+            markOptions: { tooltip: false, color: '#1f2937', size: 2 },
+            encodings: {
+              x: { field: 'month', type: 'ordinal' },
+              y: { field: 'value', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-sparkline-multiples',
+    name: '🎨 Sparkline Grid',
+    description: 'Custom viz with mini trend lines for multiple series',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'sparkline', 'small-multiples', 'trends'],
+    format: 'json',
+    data: JSON.stringify([
+      { product: 'A', week: 1, sales: 45 },
+      { product: 'A', week: 2, sales: 52 },
+      { product: 'A', week: 3, sales: 48 },
+      { product: 'A', week: 4, sales: 61 },
+      { product: 'B', week: 1, sales: 78 },
+      { product: 'B', week: 2, sales: 85 },
+      { product: 'B', week: 3, sales: 82 },
+      { product: 'B', week: 4, sales: 91 },
+      { product: 'C', week: 1, sales: 34 },
+      { product: 'C', week: 2, sales: 41 },
+      { product: 'C', week: 3, sales: 38 },
+      { product: 'C', week: 4, sales: 45 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Weekly Sales Trends by Product',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-trends',
+            mark: 'line',
+            markOptions: { tooltip: true, size: 2 },
+            encodings: {
+              x: { field: 'week', type: 'ordinal' },
+              y: { field: 'sales', type: 'quantitative' },
+              color: { field: 'product', type: 'nominal' },
+            },
+          },
+          {
+            id: 'layer-end-points',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 80 },
+            encodings: {
+              x: { field: 'week', type: 'ordinal' },
+              y: { field: 'sales', type: 'quantitative' },
+              color: { field: 'product', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
 ];
 
