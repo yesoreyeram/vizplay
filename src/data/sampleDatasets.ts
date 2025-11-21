@@ -32,6 +32,11 @@ export interface Dataset {
     legendPosition?: 'none' | 'left' | 'right' | 'top' | 'bottom';
     legendMode?: 'inline' | 'table' | 'popup';
     customVizConfig?: CustomVizConfig; // CustomVizConfig from builder
+    funnelOrientation?: 'vertical' | 'horizontal';
+    funnelDirection?: 'normal' | 'reversed';
+    funnelLabelType?: 'none' | 'value' | 'percentage' | 'both';
+    funnelShowConversionRate?: boolean;
+    funnelGap?: number;
   };
 }
 
@@ -687,6 +692,140 @@ export const sampleDatasets: Dataset[] = [
       colorField: 'load',
       title: 'Server Load by Time',
       legendPosition: 'right',
+    }
+  },
+  {
+    id: 'viz-funnel-conversion',
+    name: '🔻 Funnel Chart - E-commerce Conversion',
+    description: 'Standard funnel showing conversion stages from visit to purchase',
+    category: 'Visualization Examples',
+    tags: ['funnel', 'conversion', 'e-commerce', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { stage: 'Website Visitors', count: 100000, percentage: 100 },
+      { stage: 'Product Page Views', count: 45000, percentage: 45 },
+      { stage: 'Add to Cart', count: 18000, percentage: 18 },
+      { stage: 'Checkout Started', count: 9000, percentage: 9 },
+      { stage: 'Payment Info', count: 6300, percentage: 6.3 },
+      { stage: 'Order Complete', count: 5400, percentage: 5.4 },
+    ], null, 2),
+    vizConfig: {
+      type: 'funnel',
+      xField: 'stage',
+      yField: 'count',
+      title: 'E-commerce Sales Funnel',
+      funnelOrientation: 'vertical',
+      funnelDirection: 'normal',
+      funnelLabelType: 'both',
+      funnelShowConversionRate: true,
+      funnelGap: 0,
+    }
+  },
+  {
+    id: 'viz-funnel-reversed',
+    name: '🔺 Reversed Funnel - Customer Expansion',
+    description: 'Reversed/inverted funnel showing customer growth and expansion',
+    category: 'Visualization Examples',
+    tags: ['funnel', 'reversed', 'expansion', 'growth', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { stage: 'Free Tier', value: 1000 },
+      { stage: 'Basic Plan', value: 2500 },
+      { stage: 'Professional', value: 5200 },
+      { stage: 'Enterprise', value: 8500 },
+      { stage: 'Enterprise+', value: 12000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'funnel',
+      xField: 'stage',
+      yField: 'value',
+      title: 'Customer Expansion Funnel',
+      funnelOrientation: 'vertical',
+      funnelDirection: 'reversed',
+      funnelLabelType: 'value',
+      funnelShowConversionRate: false,
+      funnelGap: 2,
+    }
+  },
+  {
+    id: 'viz-funnel-horizontal',
+    name: '🔻 Horizontal Funnel - Sales Pipeline',
+    description: 'Horizontal funnel showing sales pipeline progression',
+    category: 'Visualization Examples',
+    tags: ['funnel', 'horizontal', 'sales', 'pipeline', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { stage: 'Leads', deals: 850 },
+      { stage: 'Qualified', deals: 420 },
+      { stage: 'Proposal', deals: 210 },
+      { stage: 'Negotiation', deals: 105 },
+      { stage: 'Closed Won', deals: 68 },
+    ], null, 2),
+    vizConfig: {
+      type: 'funnel',
+      xField: 'stage',
+      yField: 'deals',
+      title: 'Sales Pipeline Funnel',
+      funnelOrientation: 'horizontal',
+      funnelDirection: 'normal',
+      funnelLabelType: 'value',
+      funnelShowConversionRate: true,
+      funnelGap: 0,
+    }
+  },
+  {
+    id: 'viz-funnel-recruitment',
+    name: '🔻 Funnel - HR Recruitment Process',
+    description: 'Funnel chart tracking candidates through recruitment stages',
+    category: 'Visualization Examples',
+    tags: ['funnel', 'hr', 'recruitment', 'hiring', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { stage: 'Applications Received', candidates: 1250 },
+      { stage: 'Resume Screened', candidates: 380 },
+      { stage: 'Phone Screen', candidates: 125 },
+      { stage: 'Technical Interview', candidates: 65 },
+      { stage: 'Final Interview', candidates: 28 },
+      { stage: 'Offers Extended', candidates: 15 },
+      { stage: 'Offers Accepted', candidates: 12 },
+    ], null, 2),
+    vizConfig: {
+      type: 'funnel',
+      xField: 'stage',
+      yField: 'candidates',
+      title: 'Recruitment Funnel - Software Engineers',
+      funnelOrientation: 'vertical',
+      funnelDirection: 'normal',
+      funnelLabelType: 'both',
+      funnelShowConversionRate: true,
+      funnelGap: 1,
+    }
+  },
+  {
+    id: 'viz-funnel-retention',
+    name: '🔻 Funnel - Customer Retention',
+    description: 'Funnel showing customer retention over time periods',
+    category: 'Visualization Examples',
+    tags: ['funnel', 'retention', 'customer', 'churn', 'example'],
+    format: 'json',
+    data: JSON.stringify([
+      { period: 'Day 1', active_users: 50000 },
+      { period: 'Day 7', active_users: 35000 },
+      { period: 'Day 30', active_users: 22000 },
+      { period: 'Day 60', active_users: 16500 },
+      { period: 'Day 90', active_users: 14200 },
+      { period: 'Day 180', active_users: 12800 },
+    ], null, 2),
+    vizConfig: {
+      type: 'funnel',
+      xField: 'period',
+      yField: 'active_users',
+      title: 'User Retention Funnel',
+      funnelOrientation: 'vertical',
+      funnelDirection: 'normal',
+      funnelLabelType: 'percentage',
+      funnelShowConversionRate: true,
+      funnelGap: 0,
     }
   },
 

@@ -26,6 +26,12 @@ export interface VisualizationConfig {
   legendMode?: 'inline' | 'table' | 'popup';
   // Custom viz builder config
   customVizConfig?: CustomVizConfig;
+  // Funnel chart options
+  funnelOrientation?: 'vertical' | 'horizontal';
+  funnelDirection?: 'normal' | 'reversed';
+  funnelLabelType?: 'none' | 'value' | 'percentage' | 'both';
+  funnelShowConversionRate?: boolean;
+  funnelGap?: number;
 }
 
 export const visualizationTypes = [
@@ -34,6 +40,7 @@ export const visualizationTypes = [
   { id: 'area', name: 'Area Chart', description: 'Show cumulative trends' },
   { id: 'scatter', name: 'Scatter Plot', description: 'Show correlation between variables' },
   { id: 'pie', name: 'Pie Chart', description: 'Show proportions of a whole' },
+  { id: 'funnel', name: 'Funnel Chart', description: 'Show conversion or progression through stages' },
   { id: 'heatmap', name: 'Heatmap', description: 'Show patterns in matrix data' },
   { id: 'heatlane', name: 'Heat Lane', description: 'Show categorical data with color intensity' },
   { id: 'boxplot', name: 'Box Plot', description: 'Show distribution statistics' },
@@ -418,6 +425,189 @@ export function generateVegaSpec(
         },
         view: { stroke: null },
       };
+
+    case 'funnel': {
+      // Funnel chart configuration
+      const funnelOrientation = config.funnelOrientation || 'vertical';
+      const funnelDirection = config.funnelDirection || 'normal';
+      const funnelLabelType = config.funnelLabelType || 'value';
+      const funnelShowConversionRate = config.funnelShowConversionRate || false;
+      const funnelGap = config.funnelGap || 0;
+
+      // Sort data based on direction
+      const sortedData = [...data];
+      if (funnelDirection === 'reversed') {
+        sortedData.sort((a, b) => a[config.yField!] - b[config.yField!]);
+      } else {
+        sortedData.sort((a, b) => b[config.yField!] - a[config.yField!]);
+      }
+
+      // Calculate conversion rates and percentages
+      const maxValue = Math.max(...sortedData.map(d => d[config.yField!]));
+      const processedData = sortedData.map((d, i) => ({
+        ...d,
+        percentage: ((d[config.yField!] / maxValue) * 100).toFixed(1),
+        conversionRate: i > 0 
+          ? ((d[config.yField!] / sortedData[i - 1][config.yField!]) * 100).toFixed(1)
+          : '100.0',
+        order: i,
+      }));
+
+      const isHorizontal = funnelOrientation === 'horizontal';
+
+      // Build the layers for funnel visualization
+      const layers: any[] = [];
+
+      // Main bar layer
+      const barLayer: any = {
+        mark: { 
+          type: 'bar', 
+          tooltip: true,
+          ...(funnelGap > 0 && { yOffset: funnelGap * (isHorizontal ? 0 : 1), xOffset: funnelGap * (isHorizontal ? 1 : 0) })
+        },
+        encoding: isHorizontal ? {
+          x: { 
+            field: config.yField, 
+            type: 'quantitative',
+            axis: { title: config.yField }
+          },
+          y: { 
+            field: config.xField, 
+            type: 'nominal',
+            sort: processedData.map(d => d[config.xField!]),
+            axis: { title: config.xField }
+          },
+          color: config.colorField && config.colorField !== '__none__'
+            ? { 
+                field: config.colorField, 
+                type: config.colorField === config.yField ? 'quantitative' : 'nominal',
+                scale: config.colorField === config.yField 
+                  ? { scheme: 'blues', reverse: funnelDirection === 'normal' }
+                  : { scheme: 'category10' },
+                legend: showLegend ? { orient: legendOrient } : null
+              }
+            : { 
+                field: config.yField,
+                type: 'quantitative',
+                scale: { scheme: 'blues', reverse: funnelDirection === 'normal' },
+                legend: showLegend ? { orient: legendOrient } : null
+              }
+        } : {
+          y: { 
+            field: config.yField, 
+            type: 'quantitative',
+            axis: { title: config.yField }
+          },
+          x: { 
+            field: config.xField, 
+            type: 'nominal',
+            sort: processedData.map(d => d[config.xField!]),
+            axis: { title: config.xField, labelAngle: -45 }
+          },
+          color: config.colorField && config.colorField !== '__none__'
+            ? { 
+                field: config.colorField, 
+                type: config.colorField === config.yField ? 'quantitative' : 'nominal',
+                scale: config.colorField === config.yField 
+                  ? { scheme: 'blues', reverse: funnelDirection === 'normal' }
+                  : { scheme: 'category10' },
+                legend: showLegend ? { orient: legendOrient } : null
+              }
+            : { 
+                field: config.yField,
+                type: 'quantitative',
+                scale: { scheme: 'blues', reverse: funnelDirection === 'normal' },
+                legend: showLegend ? { orient: legendOrient } : null
+              }
+        }
+      };
+      layers.push(barLayer);
+
+      // Add text labels if requested
+      if (funnelLabelType !== 'none') {
+        const textLayer: any = {
+          mark: { type: 'text', align: 'center', baseline: 'middle', dx: isHorizontal ? 20 : 0, dy: isHorizontal ? 0 : -10, color: '#e5e7eb' },
+          encoding: isHorizontal ? {
+            x: { field: config.yField, type: 'quantitative' },
+            y: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            text: { 
+              field: funnelLabelType === 'value' ? config.yField 
+                    : funnelLabelType === 'percentage' ? 'percentage'
+                    : config.yField,
+              type: 'nominal'
+            }
+          } : {
+            y: { field: config.yField, type: 'quantitative' },
+            x: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            text: { 
+              field: funnelLabelType === 'value' ? config.yField 
+                    : funnelLabelType === 'percentage' ? 'percentage'
+                    : config.yField,
+              type: 'nominal'
+            }
+          }
+        };
+
+        // For 'both' label type, we need to show both value and percentage
+        if (funnelLabelType === 'both') {
+          textLayer.transform = [{
+            calculate: `datum.${config.yField} + ' (' + datum.percentage + '%)'`,
+            as: 'labelText'
+          }];
+          if (isHorizontal) {
+            textLayer.encoding.text = { field: 'labelText', type: 'nominal' };
+          } else {
+            textLayer.encoding.text = { field: 'labelText', type: 'nominal' };
+          }
+        }
+        
+        layers.push(textLayer);
+      }
+
+      // Add conversion rate labels if requested
+      if (funnelShowConversionRate) {
+        const conversionLayer: any = {
+          mark: { type: 'text', align: 'center', baseline: 'top', dy: isHorizontal ? 15 : 0, dx: isHorizontal ? 0 : 15, fontSize: 10, color: '#9ca3af' },
+          transform: [
+            { filter: 'datum.order > 0' } // Skip first item (100%)
+          ],
+          encoding: isHorizontal ? {
+            x: { field: config.yField, type: 'quantitative' },
+            y: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            text: { 
+              field: 'conversionRate',
+              type: 'nominal'
+            }
+          } : {
+            y: { field: config.yField, type: 'quantitative' },
+            x: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            text: { 
+              field: 'conversionRate',
+              type: 'nominal'
+            }
+          }
+        };
+
+        // Add prefix to conversion rate
+        conversionLayer.transform.push({
+          calculate: `'↓ ' + datum.conversionRate + '%'`,
+          as: 'conversionText'
+        });
+        if (isHorizontal) {
+          conversionLayer.encoding.text = { field: 'conversionText', type: 'nominal' };
+        } else {
+          conversionLayer.encoding.text = { field: 'conversionText', type: 'nominal' };
+        }
+
+        layers.push(conversionLayer);
+      }
+
+      return {
+        ...baseSpec,
+        data: { values: processedData },
+        layer: layers,
+      };
+    }
 
     case 'heatmap':
       return {

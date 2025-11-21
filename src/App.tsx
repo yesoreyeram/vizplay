@@ -66,6 +66,13 @@ function App() {
   const [legendPosition, setLegendPosition] = useState<'none' | 'left' | 'right' | 'top' | 'bottom'>('right');
   const [legendMode, setLegendMode] = useState<'inline' | 'table' | 'popup'>('table');
 
+  // Funnel chart specific options
+  const [funnelOrientation, setFunnelOrientation] = useState<'vertical' | 'horizontal'>('vertical');
+  const [funnelDirection, setFunnelDirection] = useState<'normal' | 'reversed'>('normal');
+  const [funnelLabelType, setFunnelLabelType] = useState<'none' | 'value' | 'percentage' | 'both'>('value');
+  const [funnelShowConversionRate, setFunnelShowConversionRate] = useState(false);
+  const [funnelGap, setFunnelGap] = useState(0);
+
   // Custom viz builder config for custom visualization type
   const [customVizConfig, setCustomVizConfig] = useState<CustomVizConfig>({ layers: [] });
 
@@ -97,11 +104,17 @@ function App() {
         referenceLine,
         legendPosition,
         legendMode,
+        funnelOrientation,
+        funnelDirection,
+        funnelLabelType,
+        funnelShowConversionRate,
+        funnelGap,
       };
     }
   }, [vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation,
       stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient,
-      xField2, showReferenceLine, referenceLine, legendPosition, legendMode]);
+      xField2, showReferenceLine, referenceLine, legendPosition, legendMode,
+      funnelOrientation, funnelDirection, funnelLabelType, funnelShowConversionRate, funnelGap]);
 
   // Auto-migrate to custom viz when switching from another chart type
   useEffect(() => {
@@ -229,6 +242,11 @@ function App() {
         xField2: vizType === 'bar' && xField2 !== '__none__' ? xField2 : undefined,
         showReferenceLine: vizType === 'bar' ? showReferenceLine : undefined,
         referenceLine: vizType === 'bar' ? referenceLine : undefined,
+        funnelOrientation: vizType === 'funnel' ? funnelOrientation : undefined,
+        funnelDirection: vizType === 'funnel' ? funnelDirection : undefined,
+        funnelLabelType: vizType === 'funnel' ? funnelLabelType : undefined,
+        funnelShowConversionRate: vizType === 'funnel' ? funnelShowConversionRate : undefined,
+        funnelGap: vizType === 'funnel' ? funnelGap : undefined,
         legendPosition,
         legendMode,
         customVizConfig: vizType === 'custom' ? customVizConfig : undefined,
@@ -237,7 +255,7 @@ function App() {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, legendPosition, legendMode, customVizConfig]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, funnelOrientation, funnelDirection, funnelLabelType, funnelShowConversionRate, funnelGap, legendPosition, legendMode, customVizConfig]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
@@ -326,6 +344,33 @@ function App() {
         setCustomVizConfig(dataset.vizConfig.customVizConfig);
       } else {
         setCustomVizConfig({ layers: [] });
+      }
+      
+      // Funnel chart options
+      if (dataset.vizConfig?.funnelOrientation) {
+        setFunnelOrientation(dataset.vizConfig.funnelOrientation);
+      } else {
+        setFunnelOrientation('vertical');
+      }
+      if (dataset.vizConfig?.funnelDirection) {
+        setFunnelDirection(dataset.vizConfig.funnelDirection);
+      } else {
+        setFunnelDirection('normal');
+      }
+      if (dataset.vizConfig?.funnelLabelType) {
+        setFunnelLabelType(dataset.vizConfig.funnelLabelType);
+      } else {
+        setFunnelLabelType('value');
+      }
+      if (dataset.vizConfig?.funnelShowConversionRate !== undefined) {
+        setFunnelShowConversionRate(dataset.vizConfig.funnelShowConversionRate);
+      } else {
+        setFunnelShowConversionRate(false);
+      }
+      if (dataset.vizConfig?.funnelGap !== undefined) {
+        setFunnelGap(dataset.vizConfig.funnelGap);
+      } else {
+        setFunnelGap(0);
       }
       
       // Set fields after a short delay to ensure data is parsed
@@ -511,6 +556,16 @@ function App() {
                         onLegendModeChange={setLegendMode}
                         customVizConfig={customVizConfig}
                         onCustomVizConfigChange={setCustomVizConfig}
+                        funnelOrientation={funnelOrientation}
+                        onFunnelOrientationChange={setFunnelOrientation}
+                        funnelDirection={funnelDirection}
+                        onFunnelDirectionChange={setFunnelDirection}
+                        funnelLabelType={funnelLabelType}
+                        onFunnelLabelTypeChange={setFunnelLabelType}
+                        funnelShowConversionRate={funnelShowConversionRate}
+                        onFunnelShowConversionRateChange={setFunnelShowConversionRate}
+                        funnelGap={funnelGap}
+                        onFunnelGapChange={setFunnelGap}
                       />
                     </div>
                   </div>

@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows, Layers } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows, Layers, Filter } from 'lucide-react';
 import { CustomVizBuilder, type CustomVizConfig } from './CustomVizBuilder';
 
 
@@ -13,6 +13,7 @@ const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   area: AreaChart,
   scatter: Circle,
   pie: PieChart,
+  funnel: Filter,
   heatmap: Grid3x3,
   heatlane: Rows,
   boxplot: Box,
@@ -67,6 +68,17 @@ interface VisualizationControlsProps {
   // Custom viz builder
   customVizConfig: CustomVizConfig;
   onCustomVizConfigChange: (config: CustomVizConfig) => void;
+  // Funnel chart options
+  funnelOrientation: 'vertical' | 'horizontal';
+  onFunnelOrientationChange: (orientation: 'vertical' | 'horizontal') => void;
+  funnelDirection: 'normal' | 'reversed';
+  onFunnelDirectionChange: (direction: 'normal' | 'reversed') => void;
+  funnelLabelType: 'none' | 'value' | 'percentage' | 'both';
+  onFunnelLabelTypeChange: (type: 'none' | 'value' | 'percentage' | 'both') => void;
+  funnelShowConversionRate: boolean;
+  onFunnelShowConversionRateChange: (show: boolean) => void;
+  funnelGap: number;
+  onFunnelGapChange: (gap: number) => void;
 }
 
 export function VisualizationControls({
@@ -113,6 +125,16 @@ export function VisualizationControls({
   onLegendModeChange,
   customVizConfig,
   onCustomVizConfigChange,
+  funnelOrientation,
+  onFunnelOrientationChange,
+  funnelDirection,
+  onFunnelDirectionChange,
+  funnelLabelType,
+  onFunnelLabelTypeChange,
+  funnelShowConversionRate,
+  onFunnelShowConversionRateChange,
+  funnelGap,
+  onFunnelGapChange,
 }: VisualizationControlsProps) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -362,6 +384,81 @@ export function VisualizationControls({
               />
             </div>
           )}
+        </>
+      )}
+
+      {vizType === 'funnel' && (
+        <>
+          <div className="space-y-1.5">
+            <Label htmlFor="funnel-orientation" className="text-xs">Orientation</Label>
+            <Select value={funnelOrientation} onValueChange={onFunnelOrientationChange}>
+              <SelectTrigger id="funnel-orientation" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="vertical">Vertical</SelectItem>
+                <SelectItem value="horizontal">Horizontal</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="funnel-direction" className="text-xs">Direction</Label>
+            <Select value={funnelDirection} onValueChange={onFunnelDirectionChange}>
+              <SelectTrigger id="funnel-direction" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="normal">Normal - Decreasing (Conversion)</SelectItem>
+                <SelectItem value="reversed">Reversed - Increasing (Expansion)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="funnel-labels" className="text-xs">Stage Labels</Label>
+            <Select value={funnelLabelType} onValueChange={onFunnelLabelTypeChange}>
+              <SelectTrigger id="funnel-labels" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="none">None - No labels</SelectItem>
+                <SelectItem value="value">Value - Show actual values</SelectItem>
+                <SelectItem value="percentage">Percentage - Show % of max</SelectItem>
+                <SelectItem value="both">Both - Value and percentage</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="funnel-conversion" className="text-xs">Conversion Rate</Label>
+            <Select 
+              value={funnelShowConversionRate ? 'show' : 'hide'} 
+              onValueChange={(v) => onFunnelShowConversionRateChange(v === 'show')}
+            >
+              <SelectTrigger id="funnel-conversion" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="hide">Hide</SelectItem>
+                <SelectItem value="show">Show between stages</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="funnel-gap" className="text-xs">Stage Gap (spacing)</Label>
+            <Input
+              id="funnel-gap"
+              type="number"
+              min="0"
+              max="20"
+              value={funnelGap}
+              onChange={(e) => onFunnelGapChange(parseInt(e.target.value) || 0)}
+              placeholder="0"
+              className="h-8 text-sm"
+            />
+          </div>
         </>
       )}
 
