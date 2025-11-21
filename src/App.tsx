@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { TopNavbar } from './components/TopNavbar';
 import { BottomNavbar } from './components/BottomNavbar';
@@ -11,6 +11,7 @@ import type { DataFormat, FieldMapping } from './lib/dataParser';
 import { generateVegaSpec, getAvailableFields } from './lib/visualizations/vegaSpecs';
 import type { Dataset } from './data/sampleDatasets';
 import type { CustomVizConfig } from './components/CustomVizBuilder';
+import { migrateToCustomViz } from './lib/visualizations/chartMigration';
 
 const initialData = JSON.stringify([
   { category: 'A', value: 28 },
@@ -67,6 +68,57 @@ function App() {
 
   // Custom viz builder config for custom visualization type
   const [customVizConfig, setCustomVizConfig] = useState<CustomVizConfig>({ layers: [] });
+
+  // Track previous viz type for migration
+  const prevVizTypeRef = useRef<string>(vizType);
+  const configSnapshotRef = useRef<any>(null);
+
+  // Capture config snapshot whenever non-custom viz type changes
+  useEffect(() => {
+    if (vizType !== 'custom') {
+      configSnapshotRef.current = {
+        type: vizType,
+        xField,
+        yField,
+        colorField: colorField !== '__none__' ? colorField : undefined,
+        sizeField: sizeField !== '__none__' ? sizeField : undefined,
+        title: chartTitle,
+        barStyle,
+        barOrientation,
+        stackNormalize,
+        xAxisSort,
+        stackSort,
+        topN,
+        showTextLabels,
+        aggregateOp,
+        colorGradient,
+        xField2: xField2 !== '__none__' ? xField2 : undefined,
+        showReferenceLine,
+        referenceLine,
+        legendPosition,
+        legendMode,
+      };
+    }
+  }, [vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation,
+      stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient,
+      xField2, showReferenceLine, referenceLine, legendPosition, legendMode]);
+
+  // Auto-migrate to custom viz when switching from another chart type
+  useEffect(() => {
+    const prevVizType = prevVizTypeRef.current;
+    
+    // Only migrate if switching TO custom AND FROM a non-custom type
+    if (vizType === 'custom' && prevVizType !== 'custom' && prevVizType !== '' && configSnapshotRef.current) {
+      // Only auto-migrate if custom config is empty (hasn't been manually set)
+      if (customVizConfig.layers.length === 0) {
+        const migratedConfig = migrateToCustomViz(configSnapshotRef.current);
+        setCustomVizConfig(migratedConfig);
+      }
+    }
+    
+    // Update the previous viz type
+    prevVizTypeRef.current = vizType;
+  }, [vizType, customVizConfig.layers.length]);
 
 
   // Parse data whenever inputs change

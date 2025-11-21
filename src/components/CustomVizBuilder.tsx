@@ -20,11 +20,14 @@ export interface VizLayer {
   encodings: {
     x?: { field: string; type: string; aggregate?: string; bin?: boolean; scale?: Record<string, unknown>; axis?: Record<string, unknown> };
     y?: { field: string; type: string; aggregate?: string; bin?: boolean; scale?: Record<string, unknown>; axis?: Record<string, unknown> };
-    color?: { field: string; type: string; scale?: Record<string, unknown>; legend?: Record<string, unknown> };
+    xOffset?: { field: string; type: string };
+    yOffset?: { field: string; type: string };
+    color?: { field: string; type: string; scale?: Record<string, unknown>; legend?: Record<string, unknown>; sort?: Record<string, unknown> | null };
     size?: { field: string; type: string; scale?: Record<string, unknown> };
     opacity?: { field: string; type: string };
     shape?: { field: string; type: string };
     text?: { field: string; type: string };
+    theta?: { field: string; type: string; aggregate?: string; stack?: boolean };
     tooltip?: Array<{ field: string; type: string }>;
   };
   transform?: Array<{
@@ -63,6 +66,8 @@ const markTypes = [
   { value: 'rule', label: 'Rule' },
   { value: 'text', label: 'Text' },
   { value: 'trail', label: 'Trail' },
+  { value: 'arc', label: 'Arc (Pie/Donut)' },
+  { value: 'boxplot', label: 'Box Plot' },
   { value: 'geoshape', label: 'Geo Shape' },
 ];
 
