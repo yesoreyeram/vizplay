@@ -8,6 +8,11 @@ export interface VisualizationConfig {
   sizeField?: string;
   title?: string;
   barStyle?: 'simple' | 'stacked' | 'grouped';
+  barOrientation?: 'vertical' | 'horizontal';
+  stackNormalize?: boolean;
+  xAxisSort?: 'none' | 'ascending' | 'descending';
+  stackSort?: 'none' | 'ascending' | 'descending';
+  topN?: number;
 }
 
 export const visualizationTypes = [
@@ -56,39 +61,103 @@ export function generateVegaSpec(
   switch (config.type) {
     case 'bar': {
       const barStyle = config.barStyle || 'simple';
-      const baseBarEncoding: any = {
-        x: { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } },
-        y: { field: config.yField, type: 'quantitative' },
+      const barOrientation = config.barOrientation || 'vertical';
+      const stackNormalize = config.stackNormalize || false;
+      const xAxisSort = config.xAxisSort || 'none';
+      const stackSort = config.stackSort || 'none';
+      const topN = config.topN || 0;
+
+      // Apply top N filtering if sorting is enabled
+      let processedData = data;
+      if (xAxisSort !== 'none' && topN > 0) {
+        // Group and sum by x field, then take top N
+        const aggregated = data.reduce((acc: any, item: any) => {
+          const key = item[config.xField!];
+          if (!acc[key]) {
+            acc[key] = 0;
+          }
+          acc[key] += item[config.yField!] || 0;
+          return {};
+        }, {});
+        
+        const sorted = Object.entries(aggregated)
+          .sort(([, a]: any, [, b]: any) => xAxisSort === 'ascending' ? a - b : b - a)
+          .slice(0, topN)
+          .map(([key]) => key);
+        
+        processedData = data.filter((item: any) => sorted.includes(item[config.xField!]));
+      }
+
+      // Determine x and y encodings based on orientation
+      const isHorizontal = barOrientation === 'horizontal';
+      const xEncoding: any = isHorizontal 
+        ? { field: config.yField, type: 'quantitative' }
+        : { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } };
+      const yEncoding: any = isHorizontal
+        ? { field: config.xField, type: 'nominal' }
+        : { field: config.yField, type: 'quantitative' };
+      
+      // Add sorting to axis encoding
+      if (xAxisSort !== 'none' && !isHorizontal) {
+        xEncoding.sort = xAxisSort === 'ascending' 
+          ? { op: 'sum', field: config.yField, order: 'ascending' }
+          : { op: 'sum', field: config.yField, order: 'descending' };
+      } else if (xAxisSort !== 'none' && isHorizontal) {
+        yEncoding.sort = xAxisSort === 'ascending'
+          ? { op: 'sum', field: config.yField, order: 'ascending' }
+          : { op: 'sum', field: config.yField, order: 'descending' };
+      }
+
+      // Stack normalization for stacked bars
+      if (barStyle === 'stacked' && stackNormalize) {
+        if (isHorizontal) {
+          xEncoding.stack = 'normalize';
+        } else {
+          yEncoding.stack = 'normalize';
+        }
+      }
+
+      const baseBarSpec: any = {
+        ...baseSpec,
+        data: { values: processedData },
       };
 
       if (barStyle === 'grouped' && config.colorField) {
         // Grouped bar chart
         return {
-          ...baseSpec,
+          ...baseBarSpec,
           mark: { type: 'bar', tooltip: true },
           encoding: {
-            ...baseBarEncoding,
-            color: { field: config.colorField, type: 'nominal' },
-            xOffset: { field: config.colorField, type: 'nominal' },
+            ...( isHorizontal ? { x: xEncoding, y: yEncoding } : { x: xEncoding, y: yEncoding }),
+            color: { 
+              field: config.colorField, 
+              type: 'nominal',
+              sort: stackSort !== 'none' ? { op: 'sum', field: config.yField, order: stackSort === 'ascending' ? 'ascending' : 'descending' } : null,
+            },
+            [isHorizontal ? 'yOffset' : 'xOffset']: { field: config.colorField, type: 'nominal' },
           },
         };
       } else if (barStyle === 'stacked' && config.colorField) {
         // Stacked bar chart
         return {
-          ...baseSpec,
+          ...baseBarSpec,
           mark: { type: 'bar', tooltip: true },
           encoding: {
-            ...baseBarEncoding,
-            color: { field: config.colorField, type: 'nominal' },
+            ...( isHorizontal ? { x: xEncoding, y: yEncoding } : { x: xEncoding, y: yEncoding }),
+            color: { 
+              field: config.colorField, 
+              type: 'nominal',
+              sort: stackSort !== 'none' ? { op: 'sum', field: config.yField, order: stackSort === 'ascending' ? 'ascending' : 'descending' } : null,
+            },
           },
         };
       } else {
         // Simple bar chart
         return {
-          ...baseSpec,
+          ...baseBarSpec,
           mark: { type: 'bar', tooltip: true },
           encoding: {
-            ...baseBarEncoding,
+            ...( isHorizontal ? { x: xEncoding, y: yEncoding } : { x: xEncoding, y: yEncoding }),
             color: config.colorField ? { field: config.colorField, type: 'nominal' } : { value: '#60a5fa' },
           },
         };

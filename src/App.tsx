@@ -44,6 +44,13 @@ function App() {
   const [colorField, setColorField] = useState('__none__');
   const [sizeField, setSizeField] = useState('__none__');
   const [chartTitle, setChartTitle] = useState('Sample Bar Chart');
+  
+  // Bar chart specific options
+  const [barOrientation, setBarOrientation] = useState<'vertical' | 'horizontal'>('vertical');
+  const [stackNormalize, setStackNormalize] = useState(false); // false = normal, true = percentage
+  const [xAxisSort, setXAxisSort] = useState<'none' | 'ascending' | 'descending'>('none');
+  const [stackSort, setStackSort] = useState<'none' | 'ascending' | 'descending'>('none');
+  const [topN, setTopN] = useState(0); // 0 = no limit
 
   // Parse data whenever inputs change
   const parsedData = useMemo(() => {
@@ -123,6 +130,11 @@ function App() {
         sizeField: sizeField && sizeField !== '__none__' ? sizeField : undefined,
         title: chartTitle,
         barStyle: vizType === 'bar' ? barStyle : undefined,
+        barOrientation: vizType === 'bar' ? barOrientation : undefined,
+        stackNormalize: vizType === 'bar' ? stackNormalize : undefined,
+        xAxisSort: vizType === 'bar' ? xAxisSort : undefined,
+        stackSort: vizType === 'bar' ? stackSort : undefined,
+        topN: vizType === 'bar' ? topN : undefined,
       });
     } catch (error) {
       console.error('Spec generation error:', error);
@@ -141,11 +153,36 @@ function App() {
       setVizType(dataset.vizConfig.type);
       setChartTitle(dataset.vizConfig.title || `${dataset.name} Visualization`);
       
-      // Set bar style if provided
+      // Set bar style and options if provided
       if (dataset.vizConfig?.barStyle) {
         setBarStyle(dataset.vizConfig.barStyle);
       } else {
         setBarStyle('simple');
+      }
+      if (dataset.vizConfig?.barOrientation) {
+        setBarOrientation(dataset.vizConfig.barOrientation);
+      } else {
+        setBarOrientation('vertical');
+      }
+      if (dataset.vizConfig?.stackNormalize !== undefined) {
+        setStackNormalize(dataset.vizConfig.stackNormalize);
+      } else {
+        setStackNormalize(false);
+      }
+      if (dataset.vizConfig?.xAxisSort) {
+        setXAxisSort(dataset.vizConfig.xAxisSort);
+      } else {
+        setXAxisSort('none');
+      }
+      if (dataset.vizConfig?.stackSort) {
+        setStackSort(dataset.vizConfig.stackSort);
+      } else {
+        setStackSort('none');
+      }
+      if (dataset.vizConfig?.topN !== undefined) {
+        setTopN(dataset.vizConfig.topN);
+      } else {
+        setTopN(0);
       }
       
       // Set fields after a short delay to ensure data is parsed
@@ -160,6 +197,11 @@ function App() {
     } else {
       setChartTitle(`${dataset.name} Visualization`);
       setBarStyle('simple');
+      setBarOrientation('vertical');
+      setStackNormalize(false);
+      setXAxisSort('none');
+      setStackSort('none');
+      setTopN(0);
     }
   };
 
@@ -275,6 +317,16 @@ function App() {
                         availableFields={availableFields}
                         barStyle={barStyle}
                         onBarStyleChange={setBarStyle}
+                        barOrientation={barOrientation}
+                        onBarOrientationChange={setBarOrientation}
+                        stackNormalize={stackNormalize}
+                        onStackNormalizeChange={setStackNormalize}
+                        xAxisSort={xAxisSort}
+                        onXAxisSortChange={setXAxisSort}
+                        stackSort={stackSort}
+                        onStackSortChange={setStackSort}
+                        topN={topN}
+                        onTopNChange={setTopN}
                       />
                     </div>
                   </div>

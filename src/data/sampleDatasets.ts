@@ -16,6 +16,11 @@ export interface Dataset {
     sizeField?: string;
     title?: string;
     barStyle?: 'simple' | 'stacked' | 'grouped';
+    barOrientation?: 'vertical' | 'horizontal';
+    stackNormalize?: boolean;
+    xAxisSort?: 'none' | 'ascending' | 'descending';
+    stackSort?: 'none' | 'ascending' | 'descending';
+    topN?: number;
   };
 }
 
@@ -102,6 +107,128 @@ export const sampleDatasets: Dataset[] = [
       colorField: 'product',
       title: 'Sales by Region and Product (Grouped)',
       barStyle: 'grouped',
+    }
+  },
+  {
+    id: 'viz-horizontal-bar',
+    name: '📊 Horizontal Bar Chart Example',
+    description: 'Product sales in horizontal orientation - great for long category names',
+    category: 'Visualization Examples',
+    tags: ['horizontal-bar', 'example', 'sales', 'orientation'],
+    format: 'json',
+    data: JSON.stringify([
+      { product: 'Professional Gaming Laptop', sales: 125000 },
+      { product: 'Ultra-Wide Monitor 34"', sales: 98000 },
+      { product: 'Wireless Keyboard & Mouse Combo', sales: 45000 },
+      { product: 'High-End Graphics Card', sales: 185000 },
+      { product: 'Ergonomic Office Chair', sales: 72000 },
+      { product: 'Standing Desk Converter', sales: 53000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'product',
+      yField: 'sales',
+      title: 'Product Sales (Horizontal)',
+      barStyle: 'simple',
+      barOrientation: 'horizontal',
+      xAxisSort: 'descending',
+    }
+  },
+  {
+    id: 'viz-percentage-stacked-bar',
+    name: '📊 Percentage Stacked Bar Example',
+    description: 'Market share composition normalized to 100% - ideal for comparing proportions',
+    category: 'Visualization Examples',
+    tags: ['percentage-bar', 'normalized', 'example', 'market-share'],
+    format: 'json',
+    data: JSON.stringify([
+      { year: '2020', segment: 'Enterprise', revenue: 2500000 },
+      { year: '2020', segment: 'SMB', revenue: 1800000 },
+      { year: '2020', segment: 'Consumer', revenue: 1200000 },
+      { year: '2021', segment: 'Enterprise', revenue: 2950000 },
+      { year: '2021', segment: 'SMB', revenue: 2100000 },
+      { year: '2021', segment: 'Consumer', revenue: 1450000 },
+      { year: '2022', segment: 'Enterprise', revenue: 3400000 },
+      { year: '2022', segment: 'SMB', revenue: 2450000 },
+      { year: '2022', segment: 'Consumer', revenue: 1650000 },
+      { year: '2023', segment: 'Enterprise', revenue: 3850000 },
+      { year: '2023', segment: 'SMB', revenue: 2800000 },
+      { year: '2023', segment: 'Consumer', revenue: 1850000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'year',
+      yField: 'revenue',
+      colorField: 'segment',
+      title: 'Revenue Composition by Segment (Percentage)',
+      barStyle: 'stacked',
+      stackNormalize: true,
+    }
+  },
+  {
+    id: 'viz-sorted-bar',
+    name: '📊 Sorted Bar Chart with Top 10',
+    description: 'Top 10 cities by population sorted descending - demonstrates sorting and limiting',
+    category: 'Visualization Examples',
+    tags: ['sorted-bar', 'top-n', 'example', 'population'],
+    format: 'json',
+    data: JSON.stringify([
+      { city: 'Tokyo', population: 37400000 },
+      { city: 'Delhi', population: 28514000 },
+      { city: 'Shanghai', population: 25582000 },
+      { city: 'São Paulo', population: 21650000 },
+      { city: 'Mexico City', population: 21581000 },
+      { city: 'Cairo', population: 20076000 },
+      { city: 'Mumbai', population: 19980000 },
+      { city: 'Beijing', population: 19618000 },
+      { city: 'Dhaka', population: 19578000 },
+      { city: 'Osaka', population: 19281000 },
+      { city: 'New York', population: 18819000 },
+      { city: 'Karachi', population: 15400000 },
+      { city: 'Buenos Aires', population: 14967000 },
+      { city: 'Chongqing', population: 14838000 },
+      { city: 'Istanbul', population: 14751000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'city',
+      yField: 'population',
+      title: 'Top 10 Cities by Population',
+      barStyle: 'simple',
+      xAxisSort: 'descending',
+      topN: 10,
+    }
+  },
+  {
+    id: 'viz-grouped-sorted-bar',
+    name: '📊 Grouped Bar with Stack Sorting',
+    description: 'Sales by region and product with sorted stacks - demonstrates multi-dimensional sorting',
+    category: 'Visualization Examples',
+    tags: ['grouped-bar', 'sorted', 'example', 'multi-dim'],
+    format: 'json',
+    data: JSON.stringify([
+      { region: 'North America', product: 'Software', sales: 8500000 },
+      { region: 'North America', product: 'Hardware', sales: 6200000 },
+      { region: 'North America', product: 'Services', sales: 4800000 },
+      { region: 'Europe', product: 'Software', sales: 7200000 },
+      { region: 'Europe', product: 'Hardware', sales: 5100000 },
+      { region: 'Europe', product: 'Services', sales: 3900000 },
+      { region: 'Asia Pacific', product: 'Software', sales: 9800000 },
+      { region: 'Asia Pacific', product: 'Hardware', sales: 8500000 },
+      { region: 'Asia Pacific', product: 'Services', sales: 5200000 },
+      { region: 'Latin America', product: 'Software', sales: 3200000 },
+      { region: 'Latin America', product: 'Hardware', sales: 2800000 },
+      { region: 'Latin America', product: 'Services', sales: 1900000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'region',
+      yField: 'sales',
+      colorField: 'product',
+      title: 'Sales by Region (Sorted by Total)',
+      barStyle: 'grouped',
+      xAxisSort: 'descending',
+      stackSort: 'descending',
     }
   },
   {

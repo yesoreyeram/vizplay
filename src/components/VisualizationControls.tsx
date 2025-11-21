@@ -31,6 +31,16 @@ interface VisualizationControlsProps {
   availableFields: string[];
   barStyle: string;
   onBarStyleChange: (style: 'simple' | 'stacked' | 'grouped') => void;
+  barOrientation: 'vertical' | 'horizontal';
+  onBarOrientationChange: (orientation: 'vertical' | 'horizontal') => void;
+  stackNormalize: boolean;
+  onStackNormalizeChange: (normalize: boolean) => void;
+  xAxisSort: 'none' | 'ascending' | 'descending';
+  onXAxisSortChange: (sort: 'none' | 'ascending' | 'descending') => void;
+  stackSort: 'none' | 'ascending' | 'descending';
+  onStackSortChange: (sort: 'none' | 'ascending' | 'descending') => void;
+  topN: number;
+  onTopNChange: (n: number) => void;
 }
 
 export function VisualizationControls({
@@ -49,6 +59,16 @@ export function VisualizationControls({
   availableFields,
   barStyle,
   onBarStyleChange,
+  barOrientation,
+  onBarOrientationChange,
+  stackNormalize,
+  onStackNormalizeChange,
+  xAxisSort,
+  onXAxisSortChange,
+  stackSort,
+  onStackSortChange,
+  topN,
+  onTopNChange,
 }: VisualizationControlsProps) {
   return (
     <div className="h-full flex flex-col p-3 space-y-3 overflow-y-auto">
@@ -85,19 +105,97 @@ export function VisualizationControls({
       </div>
 
       {vizType === 'bar' && (
-        <div className="space-y-1.5">
-          <Label htmlFor="bar-style" className="text-xs">Bar Style</Label>
-          <Select value={barStyle} onValueChange={onBarStyleChange}>
-            <SelectTrigger id="bar-style" className="h-8 text-sm">
-              <SelectValue placeholder="Select bar style" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover">
-              <SelectItem value="simple">Simple - Single bars</SelectItem>
-              <SelectItem value="stacked">Stacked - Show composition</SelectItem>
-              <SelectItem value="grouped">Grouped - Compare side-by-side</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <>
+          <div className="space-y-1.5">
+            <Label htmlFor="bar-style" className="text-xs">Bar Style</Label>
+            <Select value={barStyle} onValueChange={onBarStyleChange}>
+              <SelectTrigger id="bar-style" className="h-8 text-sm">
+                <SelectValue placeholder="Select bar style" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="simple">Simple - Single bars</SelectItem>
+                <SelectItem value="stacked">Stacked - Show composition</SelectItem>
+                <SelectItem value="grouped">Grouped - Compare side-by-side</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="bar-orientation" className="text-xs">Orientation</Label>
+            <Select value={barOrientation} onValueChange={onBarOrientationChange}>
+              <SelectTrigger id="bar-orientation" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="vertical">Vertical</SelectItem>
+                <SelectItem value="horizontal">Horizontal</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {barStyle === 'stacked' && (
+            <div className="space-y-1.5">
+              <Label htmlFor="stack-normalize" className="text-xs">Stack Mode</Label>
+              <Select 
+                value={stackNormalize ? 'normalized' : 'normal'} 
+                onValueChange={(v) => onStackNormalizeChange(v === 'normalized')}
+              >
+                <SelectTrigger id="stack-normalize" className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-popover">
+                  <SelectItem value="normal">Normal - Absolute values</SelectItem>
+                  <SelectItem value="normalized">Percentage - 100% normalized</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <Label htmlFor="x-axis-sort" className="text-xs">Sort {barOrientation === 'vertical' ? 'X-Axis' : 'Y-Axis'}</Label>
+            <Select value={xAxisSort} onValueChange={onXAxisSortChange}>
+              <SelectTrigger id="x-axis-sort" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="none">None - Original order</SelectItem>
+                <SelectItem value="ascending">Ascending</SelectItem>
+                <SelectItem value="descending">Descending</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {(barStyle === 'stacked' || barStyle === 'grouped') && (
+            <div className="space-y-1.5">
+              <Label htmlFor="stack-sort" className="text-xs">Sort Stack Items</Label>
+              <Select value={stackSort} onValueChange={onStackSortChange}>
+                <SelectTrigger id="stack-sort" className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-popover">
+                  <SelectItem value="none">None - Original order</SelectItem>
+                  <SelectItem value="ascending">Ascending by value</SelectItem>
+                  <SelectItem value="descending">Descending by value</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {xAxisSort !== 'none' && (
+            <div className="space-y-1.5">
+              <Label htmlFor="top-n" className="text-xs">Limit to Top N (0 = no limit)</Label>
+              <Input
+                id="top-n"
+                type="number"
+                min="0"
+                value={topN}
+                onChange={(e) => onTopNChange(parseInt(e.target.value) || 0)}
+                placeholder="0"
+                className="h-8 text-sm"
+              />
+            </div>
+          )}
+        </>
       )}
 
       <div className="space-y-1.5">
