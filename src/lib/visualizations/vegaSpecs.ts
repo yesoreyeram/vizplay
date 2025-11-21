@@ -442,40 +442,62 @@ export function generateVegaSpec(
         sortedData.sort((a, b) => b[config.yField!] - a[config.yField!]);
       }
 
-      // Calculate conversion rates and percentages
+      // Calculate conversion rates, percentages, and bar offsets for centering
       const maxValue = Math.max(...sortedData.map(d => d[config.yField!]));
-      const processedData = sortedData.map((d, i) => ({
-        ...d,
-        percentage: ((d[config.yField!] / maxValue) * 100).toFixed(1),
-        conversionRate: i > 0 
-          ? ((d[config.yField!] / sortedData[i - 1][config.yField!]) * 100).toFixed(1)
-          : '100.0',
-        order: i,
-      }));
+      const processedData = sortedData.map((d, i) => {
+        const value = d[config.yField!];
+        const percentage = (value / maxValue) * 100;
+        
+        return {
+          ...d,
+          percentage: percentage.toFixed(1),
+          conversionRate: i > 0 
+            ? ((value / sortedData[i - 1][config.yField!]) * 100).toFixed(1)
+            : '100.0',
+          order: i,
+          // Calculate bar size ratio for funnel effect (0-1 scale)
+          barSizeRatio: value / maxValue
+        };
+      });
 
       const isHorizontal = funnelOrientation === 'horizontal';
 
-      // Build the layers for funnel visualization
-      const layers: any[] = [];
-
-      // Main bar layer
-      const barLayer: any = {
+      // For funnel, we'll use rect marks with calculated positions to achieve center alignment
+      const funnelLayer: any = {
+        data: { values: processedData },
         mark: { 
-          type: 'bar', 
+          type: 'rect',
           tooltip: true,
-          ...(funnelGap > 0 && { yOffset: funnelGap * (isHorizontal ? 0 : 1), xOffset: funnelGap * (isHorizontal ? 1 : 0) })
+          cornerRadius: 2
         },
         encoding: isHorizontal ? {
-          x: { 
-            field: config.yField, 
-            type: 'quantitative',
-            axis: { title: config.yField }
-          },
           y: { 
             field: config.xField, 
             type: 'nominal',
             sort: { field: 'order', order: 'ascending' },
-            axis: { title: config.xField }
+            axis: { 
+              title: config.xField,
+              labelAlign: 'right',
+              labelPadding: 10
+            }
+          },
+          x: { 
+            datum: 0,
+            type: 'quantitative',
+            axis: { title: config.yField },
+            scale: { domain: [0, maxValue * 1.1] }
+          },
+          x2: { 
+            field: config.yField,
+            type: 'quantitative'
+          },
+          // Use yOffset to center the bars vertically based on value
+          yOffset: {
+            expr: `scale('y', datum.${config.xField}) + bandwidth('y') / 2 * (1 - datum.barSizeRatio)`
+          },
+          // Adjust height based on value for funnel effect
+          height: {
+            expr: `bandwidth('y') * datum.barSizeRatio`
           },
           color: config.colorField && config.colorField !== '__none__'
             ? { 
@@ -493,16 +515,33 @@ export function generateVegaSpec(
                 legend: showLegend ? { orient: legendOrient } : null
               }
         } : {
-          y: { 
-            field: config.yField, 
-            type: 'quantitative',
-            axis: { title: config.yField }
-          },
           x: { 
             field: config.xField, 
             type: 'nominal',
             sort: { field: 'order', order: 'ascending' },
-            axis: { title: config.xField, labelAngle: -45 }
+            axis: { 
+              title: config.xField, 
+              labelAngle: -45,
+              labelAlign: 'right'
+            }
+          },
+          y: { 
+            datum: 0,
+            type: 'quantitative',
+            axis: { title: config.yField },
+            scale: { domain: [0, maxValue * 1.1] }
+          },
+          y2: { 
+            field: config.yField,
+            type: 'quantitative'
+          },
+          // Use xOffset to center the bars horizontally based on value
+          xOffset: {
+            expr: `scale('x', datum.${config.xField}) + bandwidth('x') / 2 * (1 - datum.barSizeRatio)`
+          },
+          // Adjust width based on value for funnel effect
+          width: {
+            expr: `bandwidth('x') * datum.barSizeRatio`
           },
           color: config.colorField && config.colorField !== '__none__'
             ? { 
@@ -521,15 +560,33 @@ export function generateVegaSpec(
               }
         }
       };
-      layers.push(barLayer);
+
+      const layers: any[] = [funnelLayer];
 
       // Add text labels if requested
       if (funnelLabelType !== 'none') {
         const textLayer: any = {
-          mark: { type: 'text', align: 'center', baseline: 'middle', dx: isHorizontal ? 20 : 0, dy: isHorizontal ? 0 : -10, color: '#e5e7eb' },
+          data: { values: processedData },
+          mark: { 
+            type: 'text', 
+            align: 'center', 
+            baseline: 'middle', 
+            fontSize: 12, 
+            fontWeight: 'bold', 
+            color: 'white'
+          },
           encoding: isHorizontal ? {
-            x: { field: config.yField, type: 'quantitative' },
-            y: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
+            y: { 
+              field: config.xField, 
+              type: 'nominal', 
+              sort: { field: 'order', order: 'ascending' } 
+            },
+            x: { 
+              field: config.yField, 
+              type: 'quantitative',
+              scale: { domain: [0, maxValue * 1.1] },
+              aggregate: 'mean'
+            },
             text: { 
               field: funnelLabelType === 'value' ? config.yField 
                     : funnelLabelType === 'percentage' ? 'percentage'
@@ -537,8 +594,17 @@ export function generateVegaSpec(
               type: 'nominal'
             }
           } : {
-            y: { field: config.yField, type: 'quantitative' },
-            x: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
+            x: { 
+              field: config.xField, 
+              type: 'nominal', 
+              sort: { field: 'order', order: 'ascending' } 
+            },
+            y: { 
+              field: config.yField, 
+              type: 'quantitative',
+              scale: { domain: [0, maxValue * 1.1] },
+              aggregate: 'mean'
+            },
             text: { 
               field: funnelLabelType === 'value' ? config.yField 
                     : funnelLabelType === 'percentage' ? 'percentage'
@@ -563,40 +629,62 @@ export function generateVegaSpec(
       // Add conversion rate labels if requested
       if (funnelShowConversionRate) {
         const conversionLayer: any = {
-          mark: { type: 'text', align: 'center', baseline: 'top', dy: isHorizontal ? 15 : 0, dx: isHorizontal ? 0 : 15, fontSize: 10, color: '#9ca3af' },
+          data: { values: processedData },
+          mark: { 
+            type: 'text', 
+            align: 'left', 
+            baseline: 'middle',
+            dx: isHorizontal ? 10 : 5,
+            dy: isHorizontal ? 0 : -15,
+            fontSize: 10, 
+            color: '#10b981',
+            fontWeight: 'bold'
+          },
           transform: [
-            { filter: 'datum.order > 0' } // Skip first item (100%)
+            { filter: 'datum.order > 0' }, // Skip first item (100%)
+            {
+              calculate: `'↓ ' + datum.conversionRate + '%'`,
+              as: 'conversionText'
+            }
           ],
           encoding: isHorizontal ? {
-            x: { field: config.yField, type: 'quantitative' },
-            y: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
+            y: { 
+              field: config.xField, 
+              type: 'nominal', 
+              sort: { field: 'order', order: 'ascending' } 
+            },
+            x: { 
+              field: config.yField, 
+              type: 'quantitative',
+              scale: { domain: [0, maxValue * 1.1] }
+            },
             text: { 
-              field: 'conversionRate',
+              field: 'conversionText',
               type: 'nominal'
             }
           } : {
-            y: { field: config.yField, type: 'quantitative' },
-            x: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
+            x: { 
+              field: config.xField, 
+              type: 'nominal', 
+              sort: { field: 'order', order: 'ascending' } 
+            },
+            y: { 
+              field: config.yField, 
+              type: 'quantitative',
+              scale: { domain: [0, maxValue * 1.1] }
+            },
             text: { 
-              field: 'conversionRate',
+              field: 'conversionText',
               type: 'nominal'
             }
           }
         };
-
-        // Add prefix to conversion rate
-        conversionLayer.transform.push({
-          calculate: `'↓ ' + datum.conversionRate + '%'`,
-          as: 'conversionText'
-        });
-        conversionLayer.encoding.text = { field: 'conversionText', type: 'nominal' };
 
         layers.push(conversionLayer);
       }
 
       return {
         ...baseSpec,
-        data: { values: processedData },
         layer: layers,
       };
     }
