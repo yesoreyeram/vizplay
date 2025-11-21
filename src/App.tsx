@@ -10,6 +10,7 @@ import { parseData, inferDataSchema } from './lib/dataParser';
 import type { DataFormat, FieldMapping } from './lib/dataParser';
 import { generateVegaSpec, getAvailableFields } from './lib/visualizations/vegaSpecs';
 import type { Dataset } from './data/sampleDatasets';
+import type { CustomVizConfig } from './components/CustomVizBuilder';
 
 const initialData = JSON.stringify([
   { category: 'A', value: 28 },
@@ -63,6 +64,10 @@ function App() {
   // Legend controls
   const [legendPosition, setLegendPosition] = useState<'none' | 'left' | 'right' | 'top' | 'bottom'>('right');
   const [legendMode, setLegendMode] = useState<'inline' | 'table' | 'popup'>('table');
+
+  // Custom viz builder config for custom visualization type
+  const [customVizConfig, setCustomVizConfig] = useState<CustomVizConfig>({ layers: [] });
+
 
   // Parse data whenever inputs change
   const parsedData = useMemo(() => {
@@ -129,6 +134,25 @@ function App() {
 
   // Generate Vega spec
   const vegaSpec = useMemo(() => {
+    // For custom viz type, we don't require xField/yField
+    if (vizType === 'custom') {
+      if (parsedData.length === 0) {
+        return null;
+      }
+      try {
+        return generateVegaSpec(parsedData, {
+          type: vizType,
+          customVizConfig,
+          title: chartTitle,
+          legendPosition,
+          legendMode,
+        });
+      } catch (error) {
+        console.error('Spec generation error:', error);
+        return null;
+      }
+    }
+
     if (parsedData.length === 0 || !xField || !yField) {
       return null;
     }
@@ -155,12 +179,13 @@ function App() {
         referenceLine: vizType === 'bar' ? referenceLine : undefined,
         legendPosition,
         legendMode,
+        customVizConfig: vizType === 'custom' ? customVizConfig : undefined,
       });
     } catch (error) {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, legendPosition, legendMode]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, legendPosition, legendMode, customVizConfig]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
@@ -242,6 +267,13 @@ function App() {
         setLegendMode(dataset.vizConfig.legendMode);
       } else {
         setLegendMode('table');
+      }
+      
+      // Custom viz config
+      if (dataset.vizConfig?.customVizConfig) {
+        setCustomVizConfig(dataset.vizConfig.customVizConfig);
+      } else {
+        setCustomVizConfig({ layers: [] });
       }
       
       // Set fields after a short delay to ensure data is parsed
@@ -425,6 +457,8 @@ function App() {
                         onLegendPositionChange={setLegendPosition}
                         legendMode={legendMode}
                         onLegendModeChange={setLegendMode}
+                        customVizConfig={customVizConfig}
+                        onCustomVizConfigChange={setCustomVizConfig}
                       />
                     </div>
                   </div>

@@ -1,4 +1,6 @@
 // Sample datasets for visualization playground
+import type { CustomVizConfig } from '../components/CustomVizBuilder';
+
 export interface Dataset {
   id: string;
   name: string;
@@ -29,6 +31,7 @@ export interface Dataset {
     referenceLine?: number;
     legendPosition?: 'none' | 'left' | 'right' | 'top' | 'bottom';
     legendMode?: 'inline' | 'table' | 'popup';
+    customVizConfig?: CustomVizConfig; // CustomVizConfig from builder
   };
 }
 
@@ -1196,5 +1199,824 @@ export const sampleDatasets: Dataset[] = [
       { country: 'USA', cupsPerDay: 1.9, population: 331000000, imports: 1650000 },
       { country: 'Brazil', cupsPerDay: 2.1, population: 212000000, imports: 425000 },
     ], null, 2)
-  }
+  },
+
+  // Custom Visualization Examples
+  {
+    id: 'custom-multi-layer-1',
+    name: '🎨 Multi-Layer: Bar + Line',
+    description: 'Custom viz combining bars and lines - sales with trend overlay',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'multi-layer', 'bar-line', 'trend'],
+    format: 'json',
+    data: JSON.stringify([
+      { month: 'Jan', sales: 45000, target: 40000 },
+      { month: 'Feb', sales: 52000, target: 45000 },
+      { month: 'Mar', sales: 48000, target: 50000 },
+      { month: 'Apr', sales: 61000, target: 55000 },
+      { month: 'May', sales: 69000, target: 60000 },
+      { month: 'Jun', sales: 72000, target: 65000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Sales vs Target (Multi-Layer)',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-bar',
+            mark: 'bar',
+            markOptions: { tooltip: true, opacity: 0.7, color: '#3b82f6' },
+            encodings: {
+              x: { field: 'month', type: 'ordinal' },
+              y: { field: 'sales', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-line',
+            mark: 'line',
+            markOptions: { tooltip: true, color: '#ef4444', size: 3 },
+            encodings: {
+              x: { field: 'month', type: 'ordinal' },
+              y: { field: 'target', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-multi-layer-2',
+    name: '🎨 Multi-Layer: Area + Points',
+    description: 'Custom viz with area chart and scatter points overlay',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'multi-layer', 'area', 'scatter'],
+    format: 'json',
+    data: JSON.stringify([
+      { year: 2018, revenue: 120000, profit: 30000 },
+      { year: 2019, revenue: 145000, profit: 42000 },
+      { year: 2020, revenue: 132000, profit: 35000 },
+      { year: 2021, revenue: 168000, profit: 55000 },
+      { year: 2022, revenue: 195000, profit: 68000 },
+      { year: 2023, revenue: 225000, profit: 82000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Revenue & Profit Trends',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-area',
+            mark: 'area',
+            markOptions: { tooltip: true, opacity: 0.4, color: '#10b981' },
+            encodings: {
+              x: { field: 'year', type: 'ordinal' },
+              y: { field: 'revenue', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-points',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 100, color: '#8b5cf6' },
+            encodings: {
+              x: { field: 'year', type: 'ordinal' },
+              y: { field: 'profit', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-multi-layer-3',
+    name: '🎨 Multi-Layer: Dual Bar Chart',
+    description: 'Custom viz with two bar series side by side',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'multi-layer', 'bars', 'comparison'],
+    format: 'json',
+    data: JSON.stringify([
+      { category: 'Product A', online: 45000, offline: 32000 },
+      { category: 'Product B', online: 58000, offline: 41000 },
+      { category: 'Product C', online: 36000, offline: 52000 },
+      { category: 'Product D', online: 72000, offline: 38000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Online vs Offline Sales',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-online',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#06b6d4' },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'online', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-offline',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#f59e0b', opacity: 0.7 },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'offline', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-aggregated-1',
+    name: '🎨 Aggregated: Average by Category',
+    description: 'Custom viz with mean aggregation',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'aggregation', 'average', 'stats'],
+    format: 'json',
+    data: JSON.stringify([
+      { region: 'North', sales: 45000, category: 'Electronics' },
+      { region: 'North', sales: 38000, category: 'Clothing' },
+      { region: 'South', sales: 52000, category: 'Electronics' },
+      { region: 'South', sales: 41000, category: 'Clothing' },
+      { region: 'East', sales: 48000, category: 'Electronics' },
+      { region: 'East', sales: 44000, category: 'Clothing' },
+      { region: 'West', sales: 61000, category: 'Electronics' },
+      { region: 'West', sales: 35000, category: 'Clothing' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Average Sales by Category',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-avg',
+            mark: 'bar',
+            markOptions: { tooltip: true },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'sales', type: 'quantitative', aggregate: 'mean' },
+              color: { field: 'category', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-aggregated-2',
+    name: '🎨 Aggregated: Count by Group',
+    description: 'Custom viz with count aggregation',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'aggregation', 'count'],
+    format: 'json',
+    data: JSON.stringify([
+      { department: 'Engineering', employee: 'Alice', level: 'Senior' },
+      { department: 'Engineering', employee: 'Bob', level: 'Junior' },
+      { department: 'Engineering', employee: 'Charlie', level: 'Senior' },
+      { department: 'Sales', employee: 'David', level: 'Senior' },
+      { department: 'Sales', employee: 'Eve', level: 'Junior' },
+      { department: 'Marketing', employee: 'Frank', level: 'Mid' },
+      { department: 'Marketing', employee: 'Grace', level: 'Senior' },
+      { department: 'Marketing', employee: 'Henry', level: 'Junior' },
+      { department: 'Marketing', employee: 'Iris', level: 'Mid' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Employee Count by Department',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-count',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#8b5cf6' },
+            encodings: {
+              x: { field: 'department', type: 'nominal' },
+              y: { field: 'employee', type: 'quantitative', aggregate: 'count' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-color-encoding-1',
+    name: '🎨 Color Encoding: Heatmap Style',
+    description: 'Custom viz with color gradient based on values',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'color', 'heatmap', 'gradient'],
+    format: 'json',
+    data: JSON.stringify([
+      { x: 'A', y: 'Mon', value: 23 },
+      { x: 'A', y: 'Tue', value: 45 },
+      { x: 'A', y: 'Wed', value: 67 },
+      { x: 'B', y: 'Mon', value: 89 },
+      { x: 'B', y: 'Tue', value: 34 },
+      { x: 'B', y: 'Wed', value: 56 },
+      { x: 'C', y: 'Mon', value: 78 },
+      { x: 'C', y: 'Tue', value: 91 },
+      { x: 'C', y: 'Wed', value: 12 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Value Heatmap with Color Gradient',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-rect',
+            mark: 'rect',
+            markOptions: { tooltip: true },
+            encodings: {
+              x: { field: 'x', type: 'nominal' },
+              y: { field: 'y', type: 'nominal' },
+              color: { field: 'value', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-size-encoding-1',
+    name: '🎨 Size Encoding: Bubble Chart',
+    description: 'Custom viz with size mapped to a field',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'size', 'bubble', 'scatter'],
+    format: 'json',
+    data: JSON.stringify([
+      { product: 'Laptop', profit: 45000, units: 125, satisfaction: 4.5 },
+      { product: 'Phone', profit: 78000, units: 340, satisfaction: 4.7 },
+      { product: 'Tablet', profit: 32000, units: 95, satisfaction: 4.2 },
+      { product: 'Monitor', profit: 18000, units: 60, satisfaction: 4.0 },
+      { product: 'Keyboard', profit: 8500, units: 210, satisfaction: 4.3 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Product Performance Bubble Chart',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-bubbles',
+            mark: 'circle',
+            markOptions: { tooltip: true, opacity: 0.7 },
+            encodings: {
+              x: { field: 'units', type: 'quantitative' },
+              y: { field: 'profit', type: 'quantitative' },
+              size: { field: 'satisfaction', type: 'quantitative' },
+              color: { field: 'product', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-trail-1',
+    name: '🎨 Trail Mark: Time Series',
+    description: 'Custom viz using trail mark for temporal data',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'trail', 'time-series', 'temporal'],
+    format: 'json',
+    data: JSON.stringify([
+      { date: '2024-01', temperature: 5, humidity: 65 },
+      { date: '2024-02', temperature: 7, humidity: 60 },
+      { date: '2024-03', temperature: 12, humidity: 58 },
+      { date: '2024-04', temperature: 18, humidity: 55 },
+      { date: '2024-05', temperature: 23, humidity: 52 },
+      { date: '2024-06', temperature: 28, humidity: 48 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Temperature Trends with Trail',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-trail',
+            mark: 'trail',
+            markOptions: { tooltip: true, color: '#f97316' },
+            encodings: {
+              x: { field: 'date', type: 'temporal' },
+              y: { field: 'temperature', type: 'quantitative' },
+              size: { field: 'humidity', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-tick-1',
+    name: '🎨 Tick Mark: Distribution',
+    description: 'Custom viz using tick marks to show distribution',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'tick', 'distribution'],
+    format: 'json',
+    data: JSON.stringify([
+      { value: 23, category: 'A' },
+      { value: 45, category: 'A' },
+      { value: 67, category: 'A' },
+      { value: 34, category: 'B' },
+      { value: 56, category: 'B' },
+      { value: 78, category: 'B' },
+      { value: 91, category: 'B' },
+      { value: 12, category: 'C' },
+      { value: 88, category: 'C' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Value Distribution by Category',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-ticks',
+            mark: 'tick',
+            markOptions: { tooltip: true, opacity: 0.8 },
+            encodings: {
+              x: { field: 'value', type: 'quantitative' },
+              y: { field: 'category', type: 'nominal' },
+              color: { field: 'category', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-square-1',
+    name: '🎨 Square Mark: Grid Layout',
+    description: 'Custom viz using square marks for grid visualization',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'square', 'grid'],
+    format: 'json',
+    data: JSON.stringify([
+      { row: 1, col: 1, value: 45 },
+      { row: 1, col: 2, value: 67 },
+      { row: 1, col: 3, value: 34 },
+      { row: 2, col: 1, value: 89 },
+      { row: 2, col: 2, value: 23 },
+      { row: 2, col: 3, value: 56 },
+      { row: 3, col: 1, value: 78 },
+      { row: 3, col: 2, value: 91 },
+      { row: 3, col: 3, value: 12 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Grid Visualization with Squares',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-squares',
+            mark: 'square',
+            markOptions: { tooltip: true, size: 200 },
+            encodings: {
+              x: { field: 'col', type: 'ordinal' },
+              y: { field: 'row', type: 'ordinal' },
+              color: { field: 'value', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-text-1',
+    name: '🎨 Text Mark: Labels',
+    description: 'Custom viz using text marks for annotations',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'text', 'labels', 'annotation'],
+    format: 'json',
+    data: JSON.stringify([
+      { x: 1, y: 45, label: 'Start' },
+      { x: 2, y: 67, label: 'Growth' },
+      { x: 3, y: 89, label: 'Peak' },
+      { x: 4, y: 72, label: 'Decline' },
+      { x: 5, y: 85, label: 'Recovery' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Timeline with Text Labels',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-line',
+            mark: 'line',
+            markOptions: { tooltip: true, color: '#3b82f6', size: 2 },
+            encodings: {
+              x: { field: 'x', type: 'quantitative' },
+              y: { field: 'y', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-text',
+            mark: 'text',
+            markOptions: { tooltip: true, color: '#1f2937' },
+            encodings: {
+              x: { field: 'x', type: 'quantitative' },
+              y: { field: 'y', type: 'quantitative' },
+              text: { field: 'label', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-rule-1',
+    name: '🎨 Rule Mark: Reference Lines',
+    description: 'Custom viz using rule marks for reference lines',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'rule', 'reference', 'threshold'],
+    format: 'json',
+    data: JSON.stringify([
+      { month: 'Jan', value: 45, threshold: 50 },
+      { month: 'Feb', value: 52, threshold: 50 },
+      { month: 'Mar', value: 48, threshold: 50 },
+      { month: 'Apr', value: 61, threshold: 50 },
+      { month: 'May', value: 69, threshold: 50 },
+      { month: 'Jun', value: 72, threshold: 50 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Values with Threshold Line',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-bars',
+            mark: 'bar',
+            markOptions: { tooltip: true },
+            encodings: {
+              x: { field: 'month', type: 'ordinal' },
+              y: { field: 'value', type: 'quantitative' },
+              color: { field: 'month', type: 'nominal' },
+            },
+          },
+          {
+            id: 'layer-threshold',
+            mark: 'rule',
+            markOptions: { tooltip: true, color: '#ef4444', size: 2 },
+            encodings: {
+              y: { field: 'threshold', type: 'quantitative', aggregate: 'mean' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-triple-layer-1',
+    name: '🎨 Triple Layer: Comprehensive View',
+    description: 'Custom viz with three layers: area, line, and points',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'multi-layer', 'complex', 'comprehensive'],
+    format: 'json',
+    data: JSON.stringify([
+      { quarter: 'Q1-22', revenue: 120000, cost: 85000, profit: 35000 },
+      { quarter: 'Q2-22', revenue: 145000, cost: 95000, profit: 50000 },
+      { quarter: 'Q3-22', revenue: 132000, cost: 88000, profit: 44000 },
+      { quarter: 'Q4-22', revenue: 168000, cost: 102000, profit: 66000 },
+      { quarter: 'Q1-23', revenue: 195000, cost: 115000, profit: 80000 },
+      { quarter: 'Q2-23', revenue: 225000, cost: 128000, profit: 97000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Quarterly Financial Overview (Triple Layer)',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-revenue-area',
+            mark: 'area',
+            markOptions: { tooltip: true, opacity: 0.3, color: '#10b981' },
+            encodings: {
+              x: { field: 'quarter', type: 'ordinal' },
+              y: { field: 'revenue', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-cost-line',
+            mark: 'line',
+            markOptions: { tooltip: true, color: '#f59e0b', size: 3 },
+            encodings: {
+              x: { field: 'quarter', type: 'ordinal' },
+              y: { field: 'cost', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-profit-points',
+            mark: 'circle',
+            markOptions: { tooltip: true, color: '#8b5cf6', size: 100 },
+            encodings: {
+              x: { field: 'quarter', type: 'ordinal' },
+              y: { field: 'profit', type: 'quantitative' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-max-aggregation',
+    name: '🎨 Aggregated: Maximum Values',
+    description: 'Custom viz showing max values by category',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'aggregation', 'max', 'comparison'],
+    format: 'json',
+    data: JSON.stringify([
+      { product: 'Widget A', region: 'North', sales: 45000 },
+      { product: 'Widget A', region: 'South', sales: 52000 },
+      { product: 'Widget A', region: 'East', sales: 48000 },
+      { product: 'Widget B', region: 'North', sales: 38000 },
+      { product: 'Widget B', region: 'South', sales: 61000 },
+      { product: 'Widget B', region: 'East', sales: 44000 },
+      { product: 'Widget C', region: 'North', sales: 72000 },
+      { product: 'Widget C', region: 'South', sales: 68000 },
+      { product: 'Widget C', region: 'East', sales: 75000 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Maximum Sales by Product',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-max',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#ec4899' },
+            encodings: {
+              x: { field: 'product', type: 'nominal' },
+              y: { field: 'sales', type: 'quantitative', aggregate: 'max' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-min-aggregation',
+    name: '🎨 Aggregated: Minimum Values',
+    description: 'Custom viz showing min values by category',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'aggregation', 'min', 'analysis'],
+    format: 'json',
+    data: JSON.stringify([
+      { store: 'Store A', day: 'Mon', customers: 245 },
+      { store: 'Store A', day: 'Tue', customers: 189 },
+      { store: 'Store A', day: 'Wed', customers: 267 },
+      { store: 'Store B', day: 'Mon', customers: 312 },
+      { store: 'Store B', day: 'Tue', customers: 278 },
+      { store: 'Store B', day: 'Wed', customers: 295 },
+      { store: 'Store C', day: 'Mon', customers: 156 },
+      { store: 'Store C', day: 'Tue', customers: 198 },
+      { store: 'Store C', day: 'Wed', customers: 223 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Minimum Daily Customers by Store',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-min',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#06b6d4' },
+            encodings: {
+              x: { field: 'store', type: 'nominal' },
+              y: { field: 'customers', type: 'quantitative', aggregate: 'min' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-median-aggregation',
+    name: '🎨 Aggregated: Median Values',
+    description: 'Custom viz using median aggregation for robust statistics',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'aggregation', 'median', 'statistics'],
+    format: 'json',
+    data: JSON.stringify([
+      { category: 'Electronics', price: 299 },
+      { category: 'Electronics', price: 899 },
+      { category: 'Electronics', price: 599 },
+      { category: 'Electronics', price: 1299 },
+      { category: 'Clothing', price: 49 },
+      { category: 'Clothing', price: 89 },
+      { category: 'Clothing', price: 129 },
+      { category: 'Clothing', price: 69 },
+      { category: 'Food', price: 15 },
+      { category: 'Food', price: 25 },
+      { category: 'Food', price: 18 },
+      { category: 'Food', price: 32 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Median Price by Category',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-median',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#a855f7' },
+            encodings: {
+              x: { field: 'category', type: 'nominal' },
+              y: { field: 'price', type: 'quantitative', aggregate: 'median' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-sum-aggregation',
+    name: '🎨 Aggregated: Total Sum',
+    description: 'Custom viz with sum aggregation for totals',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'aggregation', 'sum', 'total'],
+    format: 'json',
+    data: JSON.stringify([
+      { department: 'Sales', expense: 15000, type: 'Marketing' },
+      { department: 'Sales', expense: 8000, type: 'Travel' },
+      { department: 'Sales', expense: 12000, type: 'Equipment' },
+      { department: 'Engineering', expense: 45000, type: 'Software' },
+      { department: 'Engineering', expense: 32000, type: 'Hardware' },
+      { department: 'Engineering', expense: 18000, type: 'Training' },
+      { department: 'HR', expense: 6000, type: 'Recruiting' },
+      { department: 'HR', expense: 4500, type: 'Benefits' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Total Expenses by Department',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-sum',
+            mark: 'bar',
+            markOptions: { tooltip: true, color: '#14b8a6' },
+            encodings: {
+              x: { field: 'department', type: 'nominal' },
+              y: { field: 'expense', type: 'quantitative', aggregate: 'sum' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-multi-encoding-1',
+    name: '🎨 Multi-Encoding: Full Spectrum',
+    description: 'Custom viz with x, y, color, and size all encoded',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'multi-encoding', 'comprehensive', 'complex'],
+    format: 'json',
+    data: JSON.stringify([
+      { country: 'USA', gdp: 21000, population: 331, happiness: 7.0, continent: 'Americas' },
+      { country: 'China', gdp: 14000, population: 1400, happiness: 5.2, continent: 'Asia' },
+      { country: 'Japan', gdp: 5000, population: 126, happiness: 5.9, continent: 'Asia' },
+      { country: 'Germany', gdp: 3800, population: 83, happiness: 7.1, continent: 'Europe' },
+      { country: 'UK', gdp: 2800, population: 67, happiness: 6.8, continent: 'Europe' },
+      { country: 'India', gdp: 2900, population: 1380, happiness: 4.0, continent: 'Asia' },
+      { country: 'France', gdp: 2700, population: 65, happiness: 6.6, continent: 'Europe' },
+      { country: 'Brazil', gdp: 1800, population: 212, happiness: 6.3, continent: 'Americas' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Country Comparison: GDP, Population, Happiness',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-bubbles',
+            mark: 'circle',
+            markOptions: { tooltip: true, opacity: 0.7 },
+            encodings: {
+              x: { field: 'gdp', type: 'quantitative' },
+              y: { field: 'happiness', type: 'quantitative' },
+              size: { field: 'population', type: 'quantitative' },
+              color: { field: 'continent', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-temporal-1',
+    name: '🎨 Temporal: Time Series Analysis',
+    description: 'Custom viz with temporal encoding for time-based data',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'temporal', 'time-series', 'trend'],
+    format: 'json',
+    data: JSON.stringify([
+      { date: '2024-01-01', value: 45, category: 'Product A' },
+      { date: '2024-02-01', value: 52, category: 'Product A' },
+      { date: '2024-03-01', value: 48, category: 'Product A' },
+      { date: '2024-04-01', value: 61, category: 'Product A' },
+      { date: '2024-01-01', value: 38, category: 'Product B' },
+      { date: '2024-02-01', value: 44, category: 'Product B' },
+      { date: '2024-03-01', value: 51, category: 'Product B' },
+      { date: '2024-04-01', value: 58, category: 'Product B' },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Product Trends Over Time',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-lines',
+            mark: 'line',
+            markOptions: { tooltip: true, size: 3 },
+            encodings: {
+              x: { field: 'date', type: 'temporal' },
+              y: { field: 'value', type: 'quantitative' },
+              color: { field: 'category', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-combined-marks-1',
+    name: '🎨 Combined Marks: Area + Circle + Rule',
+    description: 'Custom viz combining area chart, circles, and reference rule',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'multi-layer', 'complex', 'advanced'],
+    format: 'json',
+    data: JSON.stringify([
+      { month: 'Jan', value: 45, target: 50, peak: 48 },
+      { month: 'Feb', value: 52, target: 50, peak: 55 },
+      { month: 'Mar', value: 48, target: 50, peak: 51 },
+      { month: 'Apr', value: 61, target: 50, peak: 64 },
+      { month: 'May', value: 69, target: 50, peak: 72 },
+      { month: 'Jun', value: 72, target: 50, peak: 75 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Performance Analysis with Multiple Indicators',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-area',
+            mark: 'area',
+            markOptions: { tooltip: true, opacity: 0.4, color: '#3b82f6' },
+            encodings: {
+              x: { field: 'month', type: 'ordinal' },
+              y: { field: 'value', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-peaks',
+            mark: 'circle',
+            markOptions: { tooltip: true, size: 80, color: '#10b981' },
+            encodings: {
+              x: { field: 'month', type: 'ordinal' },
+              y: { field: 'peak', type: 'quantitative' },
+            },
+          },
+          {
+            id: 'layer-target',
+            mark: 'rule',
+            markOptions: { tooltip: true, color: '#ef4444', size: 2 },
+            encodings: {
+              y: { field: 'target', type: 'quantitative', aggregate: 'mean' },
+            },
+          },
+        ],
+      },
+    },
+  },
+  {
+    id: 'custom-advanced-scatter',
+    name: '🎨 Advanced Scatter: Multi-Dimensional',
+    description: 'Custom scatter plot with 4+ dimensions encoded',
+    category: 'Custom Visualizations',
+    tags: ['custom', 'scatter', 'multi-dimensional', 'analysis'],
+    format: 'json',
+    data: JSON.stringify([
+      { age: 25, salary: 55000, experience: 2, department: 'Engineering', performance: 85 },
+      { age: 32, salary: 78000, experience: 7, department: 'Engineering', performance: 92 },
+      { age: 28, salary: 62000, experience: 4, department: 'Sales', performance: 88 },
+      { age: 35, salary: 95000, experience: 10, department: 'Engineering', performance: 95 },
+      { age: 29, salary: 58000, experience: 3, department: 'Marketing', performance: 82 },
+      { age: 41, salary: 105000, experience: 15, department: 'Engineering', performance: 97 },
+      { age: 26, salary: 52000, experience: 2, department: 'Sales', performance: 79 },
+      { age: 38, salary: 88000, experience: 12, department: 'Sales', performance: 91 },
+    ], null, 2),
+    vizConfig: {
+      type: 'custom',
+      title: 'Employee Analysis: Multi-Dimensional View',
+      customVizConfig: {
+        layers: [
+          {
+            id: 'layer-scatter',
+            mark: 'circle',
+            markOptions: { tooltip: true, opacity: 0.8 },
+            encodings: {
+              x: { field: 'experience', type: 'quantitative' },
+              y: { field: 'salary', type: 'quantitative' },
+              size: { field: 'performance', type: 'quantitative' },
+              color: { field: 'department', type: 'nominal' },
+            },
+          },
+        ],
+      },
+    },
+  },
 ];
+

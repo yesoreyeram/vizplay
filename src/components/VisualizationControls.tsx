@@ -2,7 +2,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows, Code } from 'lucide-react';
+import { CustomVizBuilder, type CustomVizConfig } from './CustomVizBuilder';
+
+
 
 const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   bar: BarChart3,
@@ -14,6 +17,7 @@ const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   heatlane: Rows,
   boxplot: Box,
   histogram: BarChart2,
+  custom: Code,
 };
 
 interface VisualizationControlsProps {
@@ -60,6 +64,9 @@ interface VisualizationControlsProps {
   onLegendPositionChange: (position: 'none' | 'left' | 'right' | 'top' | 'bottom') => void;
   legendMode: 'inline' | 'table' | 'popup';
   onLegendModeChange: (mode: 'inline' | 'table' | 'popup') => void;
+  // Custom viz builder
+  customVizConfig: CustomVizConfig;
+  onCustomVizConfigChange: (config: CustomVizConfig) => void;
 }
 
 export function VisualizationControls({
@@ -104,6 +111,8 @@ export function VisualizationControls({
   onLegendPositionChange,
   legendMode,
   onLegendModeChange,
+  customVizConfig,
+  onCustomVizConfigChange,
 }: VisualizationControlsProps) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -148,6 +157,15 @@ export function VisualizationControls({
 
       {/* Scrollable content area */}
       <div className="flex-1 overflow-y-auto p-3 pt-0 space-y-3">
+
+      {vizType === 'custom' ? (
+        <CustomVizBuilder 
+          config={customVizConfig}
+          onChange={onCustomVizConfigChange}
+          availableFields={availableFields}
+        />
+      ) : (
+        <>
 
       {vizType === 'bar' && (
         <>
@@ -461,6 +479,8 @@ export function VisualizationControls({
             </SelectContent>
           </Select>
         </div>
+      )}
+      </>
       )}
       </div>
     </div>
