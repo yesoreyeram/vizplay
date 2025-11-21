@@ -11,9 +11,10 @@ interface DataInputSectionProps {
   value: string;
   onChange: (value: string) => void;
   onLoadDataset: (dataset: Dataset) => void;
+  onTabChange: (value: string) => void;
 }
 
-export function DataInputSection({ value, onChange, onLoadDataset }: DataInputSectionProps) {
+export function DataInputSection({ value, onChange, onLoadDataset, onTabChange }: DataInputSectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null);
@@ -51,8 +52,8 @@ export function DataInputSection({ value, onChange, onLoadDataset }: DataInputSe
 
   return (
     <div className="h-full flex flex-col">
-      <Tabs defaultValue="input" className="h-full flex flex-col">
-        <TabsList className="mx-3 mt-3 w-auto">
+      <Tabs defaultValue="input" className="h-full flex flex-col" onValueChange={onTabChange}>
+        <TabsList className="mx-3 mt-3 w-auto justify-start">
           <TabsTrigger value="input" className="text-xs">Input</TabsTrigger>
           <TabsTrigger value="samples" className="text-xs">Sample Datasets</TabsTrigger>
         </TabsList>

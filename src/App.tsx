@@ -20,7 +20,14 @@ const initialData = JSON.stringify([
 ], null, 2);
 
 function App() {
-  const [rawData, setRawData] = useState(initialData);
+  // Separate data states for manual input and sample dataset
+  const [manualInputData, setManualInputData] = useState(initialData);
+  const [sampleDatasetData, setSampleDatasetData] = useState('');
+  const [activeDataSource, setActiveDataSource] = useState<'input' | 'samples'>('input');
+  
+  // Use the appropriate data source based on active tab
+  const rawData = activeDataSource === 'input' ? manualInputData : sampleDatasetData;
+  
   const [dataFormat, setDataFormat] = useState<DataFormat>('json');
   const [jsonataExpression, setJsonataExpression] = useState('');
   const [fieldMappings, setFieldMappings] = useState<FieldMapping[]>([]);
@@ -117,11 +124,19 @@ function App() {
   }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle]);
 
   const handleLoadDataset = (dataset: Dataset) => {
-    setRawData(dataset.data);
+    setSampleDatasetData(dataset.data);
     setDataFormat(dataset.format);
     setJsonataExpression('');
     setFieldMappings([]);
     setChartTitle(`${dataset.name} Visualization`);
+  };
+
+  const handleManualInputChange = (value: string) => {
+    setManualInputData(value);
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveDataSource(value as 'input' | 'samples');
   };
 
   const dataStats = {
@@ -147,9 +162,10 @@ function App() {
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <DataInputSection 
-                        value={rawData} 
-                        onChange={setRawData}
+                        value={manualInputData} 
+                        onChange={handleManualInputChange}
                         onLoadDataset={handleLoadDataset}
+                        onTabChange={handleTabChange}
                       />
                     </div>
                   </div>
