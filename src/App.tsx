@@ -140,7 +140,7 @@ function App() {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
