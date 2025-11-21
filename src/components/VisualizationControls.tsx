@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2 } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, Rows } from 'lucide-react';
 
 const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   bar: BarChart3,
@@ -11,6 +11,7 @@ const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   scatter: Circle,
   pie: PieChart,
   heatmap: Grid3x3,
+  heatlane: Rows,
   boxplot: Box,
   histogram: BarChart2,
 };
@@ -30,7 +31,7 @@ interface VisualizationControlsProps {
   onTitleChange: (title: string) => void;
   availableFields: string[];
   barStyle: string;
-  onBarStyleChange: (style: 'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt') => void;
+  onBarStyleChange: (style: 'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt' | 'diverging-stacked') => void;
   barOrientation: 'vertical' | 'horizontal';
   onBarOrientationChange: (orientation: 'vertical' | 'horizontal') => void;
   stackNormalize: boolean;
@@ -54,6 +55,11 @@ interface VisualizationControlsProps {
   onShowReferenceLineChange: (show: boolean) => void;
   referenceLine: number;
   onReferenceLineChange: (value: number) => void;
+  // Legend controls
+  legendPosition: 'none' | 'left' | 'right' | 'top' | 'bottom';
+  onLegendPositionChange: (position: 'none' | 'left' | 'right' | 'top' | 'bottom') => void;
+  legendMode: 'inline' | 'table' | 'popup';
+  onLegendModeChange: (mode: 'inline' | 'table' | 'popup') => void;
 }
 
 export function VisualizationControls({
@@ -94,6 +100,10 @@ export function VisualizationControls({
   onShowReferenceLineChange,
   referenceLine,
   onReferenceLineChange,
+  legendPosition,
+  onLegendPositionChange,
+  legendMode,
+  onLegendModeChange,
 }: VisualizationControlsProps) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -152,6 +162,7 @@ export function VisualizationControls({
                 <SelectItem value="stacked">Stacked - Show composition</SelectItem>
                 <SelectItem value="grouped">Grouped - Compare side-by-side</SelectItem>
                 <SelectItem value="diverging">Diverging - Positive/negative</SelectItem>
+                <SelectItem value="diverging-stacked">Diverging Stacked - Center-aligned stacks</SelectItem>
                 <SelectItem value="gantt">Gantt - Time ranges</SelectItem>
               </SelectContent>
             </Select>
@@ -414,6 +425,39 @@ export function VisualizationControls({
                   {field}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Legend Controls */}
+      <div className="space-y-1.5">
+        <Label htmlFor="legend-position" className="text-xs">Legend Position</Label>
+        <Select value={legendPosition} onValueChange={onLegendPositionChange}>
+          <SelectTrigger id="legend-position" className="h-8 text-sm">
+            <SelectValue placeholder="Select position" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover">
+            <SelectItem value="none">None (Hidden)</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="top">Top</SelectItem>
+            <SelectItem value="bottom">Bottom</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {legendPosition !== 'none' && (
+        <div className="space-y-1.5">
+          <Label htmlFor="legend-mode" className="text-xs">Legend Display Mode</Label>
+          <Select value={legendMode} onValueChange={onLegendModeChange}>
+            <SelectTrigger id="legend-mode" className="h-8 text-sm">
+              <SelectValue placeholder="Select mode" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover">
+              <SelectItem value="table">Table (default)</SelectItem>
+              <SelectItem value="inline">Inline</SelectItem>
+              <SelectItem value="popup">Popup with help icon</SelectItem>
             </SelectContent>
           </Select>
         </div>

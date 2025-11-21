@@ -15,7 +15,7 @@ export interface Dataset {
     colorField?: string;
     sizeField?: string;
     title?: string;
-    barStyle?: 'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt';
+    barStyle?: 'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt' | 'diverging-stacked';
     barOrientation?: 'vertical' | 'horizontal';
     stackNormalize?: boolean;
     xAxisSort?: 'none' | 'ascending' | 'descending';
@@ -27,6 +27,8 @@ export interface Dataset {
     xField2?: string;
     showReferenceLine?: boolean;
     referenceLine?: number;
+    legendPosition?: 'none' | 'left' | 'right' | 'top' | 'bottom';
+    legendMode?: 'inline' | 'table' | 'popup';
   };
 }
 
@@ -611,6 +613,77 @@ export const sampleDatasets: Dataset[] = [
       barStyle: 'simple',
       aggregateOp: 'average',
       showTextLabels: true,
+    }
+  },
+  {
+    id: 'viz-diverging-stacked',
+    name: '📊 Diverging Stacked Bar Chart',
+    description: 'Survey responses with center-aligned stacks showing agreement/disagreement',
+    category: 'Visualization Examples',
+    tags: ['diverging', 'stacked', 'survey', 'likert'],
+    format: 'json',
+    data: JSON.stringify([
+      { question: 'Product Quality', response: 'Strongly Disagree', value: -15 },
+      { question: 'Product Quality', response: 'Disagree', value: -10 },
+      { question: 'Product Quality', response: 'Neutral', value: 20 },
+      { question: 'Product Quality', response: 'Agree', value: 35 },
+      { question: 'Product Quality', response: 'Strongly Agree', value: 25 },
+      { question: 'Customer Service', response: 'Strongly Disagree', value: -8 },
+      { question: 'Customer Service', response: 'Disagree', value: -12 },
+      { question: 'Customer Service', response: 'Neutral', value: 15 },
+      { question: 'Customer Service', response: 'Agree', value: 40 },
+      { question: 'Customer Service', response: 'Strongly Agree', value: 30 },
+      { question: 'Value for Money', response: 'Strongly Disagree', value: -20 },
+      { question: 'Value for Money', response: 'Disagree', value: -18 },
+      { question: 'Value for Money', response: 'Neutral', value: 25 },
+      { question: 'Value for Money', response: 'Agree', value: 28 },
+      { question: 'Value for Money', response: 'Strongly Agree', value: 22 },
+    ], null, 2),
+    vizConfig: {
+      type: 'bar',
+      xField: 'question',
+      yField: 'value',
+      colorField: 'response',
+      title: 'Customer Survey Results',
+      barStyle: 'diverging-stacked',
+      barOrientation: 'horizontal',
+      legendPosition: 'bottom',
+    }
+  },
+  {
+    id: 'viz-heatlane',
+    name: '🌡️ Heat Lane Chart',
+    description: 'Server performance by day and hour showing load intensity',
+    category: 'Visualization Examples',
+    tags: ['heatlane', 'heatmap', 'performance', 'monitoring'],
+    format: 'json',
+    data: JSON.stringify([
+      { server: 'Server A', hour: '00:00', load: 20 },
+      { server: 'Server A', hour: '04:00', load: 15 },
+      { server: 'Server A', hour: '08:00', load: 65 },
+      { server: 'Server A', hour: '12:00', load: 85 },
+      { server: 'Server A', hour: '16:00', load: 90 },
+      { server: 'Server A', hour: '20:00', load: 55 },
+      { server: 'Server B', hour: '00:00', load: 18 },
+      { server: 'Server B', hour: '04:00', load: 12 },
+      { server: 'Server B', hour: '08:00', load: 70 },
+      { server: 'Server B', hour: '12:00', load: 88 },
+      { server: 'Server B', hour: '16:00', load: 92 },
+      { server: 'Server B', hour: '20:00', load: 60 },
+      { server: 'Server C', hour: '00:00', load: 22 },
+      { server: 'Server C', hour: '04:00', load: 18 },
+      { server: 'Server C', hour: '08:00', load: 60 },
+      { server: 'Server C', hour: '12:00', load: 82 },
+      { server: 'Server C', hour: '16:00', load: 87 },
+      { server: 'Server C', hour: '20:00', load: 52 },
+    ], null, 2),
+    vizConfig: {
+      type: 'heatlane',
+      xField: 'server',
+      yField: 'hour',
+      colorField: 'load',
+      title: 'Server Load by Time',
+      legendPosition: 'right',
     }
   },
 

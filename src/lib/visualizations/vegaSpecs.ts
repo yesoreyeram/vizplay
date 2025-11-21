@@ -7,7 +7,7 @@ export interface VisualizationConfig {
   colorField?: string;
   sizeField?: string;
   title?: string;
-  barStyle?: 'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt';
+  barStyle?: 'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt' | 'diverging-stacked';
   barOrientation?: 'vertical' | 'horizontal';
   stackNormalize?: boolean;
   xAxisSort?: 'none' | 'ascending' | 'descending';
@@ -20,6 +20,9 @@ export interface VisualizationConfig {
   xField2?: string; // For Gantt charts (end field)
   referenceLine?: number; // For adding reference/average lines
   showReferenceLine?: boolean;
+  // Legend controls
+  legendPosition?: 'none' | 'left' | 'right' | 'top' | 'bottom';
+  legendMode?: 'inline' | 'table' | 'popup';
 }
 
 export const visualizationTypes = [
@@ -29,6 +32,7 @@ export const visualizationTypes = [
   { id: 'scatter', name: 'Scatter Plot', description: 'Show correlation between variables' },
   { id: 'pie', name: 'Pie Chart', description: 'Show proportions of a whole' },
   { id: 'heatmap', name: 'Heatmap', description: 'Show patterns in matrix data' },
+  { id: 'heatlane', name: 'Heat Lane', description: 'Show categorical data with color intensity' },
   { id: 'boxplot', name: 'Box Plot', description: 'Show distribution statistics' },
   { id: 'histogram', name: 'Histogram', description: 'Show frequency distribution' },
 ];
@@ -37,6 +41,11 @@ export function generateVegaSpec(
   data: any[],
   config: VisualizationConfig
 ): TopLevelSpec {
+  // Determine legend configuration
+  const legendPosition = config.legendPosition || 'right';
+  const showLegend = legendPosition !== 'none';
+  const legendOrient = legendPosition === 'none' ? 'right' : legendPosition;
+  
   const baseSpec: any = {
     $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
     width: 'container',
@@ -58,10 +67,11 @@ export function generateVegaSpec(
         color: '#e5e7eb',
         font: 'system-ui',
       },
-      legend: {
+      legend: showLegend ? {
         labelColor: '#e5e7eb',
         titleColor: '#e5e7eb',
-      },
+        orient: legendOrient,
+      } : null,
     },
   };
 
@@ -154,7 +164,49 @@ export function generateVegaSpec(
             }
           },
         };
+        if (!showLegend) {
+          divergingSpec.encoding.color.legend = null;
+        }
         return divergingSpec;
+      }
+
+      // Handle diverging stacked bar chart (with neutral parts)
+      if (barStyle === 'diverging-stacked' && config.colorField && config.colorField !== '__none__') {
+        const divergingStackedSpec: any = {
+          ...baseSpec,
+          data: { values: processedData },
+          mark: { type: 'bar', tooltip: true },
+          encoding: isHorizontal ? {
+            y: { field: config.xField, type: 'nominal' },
+            x: { 
+              field: config.yField, 
+              type: 'quantitative',
+              stack: 'center',
+              axis: { title: config.yField }
+            },
+            color: { 
+              field: config.colorField, 
+              type: 'nominal',
+              legend: showLegend ? { orient: legendOrient } : null,
+              scale: { scheme: 'category10' }
+            }
+          } : {
+            x: { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } },
+            y: { 
+              field: config.yField, 
+              type: 'quantitative',
+              stack: 'center',
+              axis: { title: config.yField }
+            },
+            color: { 
+              field: config.colorField, 
+              type: 'nominal',
+              legend: showLegend ? { orient: legendOrient } : null,
+              scale: { scheme: 'category10' }
+            }
+          },
+        };
+        return divergingStackedSpec;
       }
 
       // Standard bar encodings
@@ -214,13 +266,15 @@ export function generateVegaSpec(
         colorEncoding = { 
           field: config.yField, 
           type: 'quantitative',
-          scale: { scheme: 'blues' }
+          scale: { scheme: 'blues' },
+          legend: showLegend ? { orient: legendOrient } : null
         };
       } else if (config.colorField && config.colorField !== '__none__') {
         colorEncoding = { 
           field: config.colorField, 
           type: 'nominal',
           sort: stackSort !== 'none' ? { op: 'sum', field: config.yField, order: stackSort === 'ascending' ? 'ascending' : 'descending' } : null,
+          legend: showLegend ? { orient: legendOrient } : null
         };
       } else {
         colorEncoding = { value: '#60a5fa' };
@@ -368,8 +422,37 @@ export function generateVegaSpec(
         encoding: {
           x: { field: config.xField, type: 'ordinal' },
           y: { field: config.yField, type: 'ordinal' },
-          color: { field: config.colorField, type: 'quantitative', scale: { scheme: 'viridis' } },
+          color: { 
+            field: config.colorField, 
+            type: 'quantitative', 
+            scale: { scheme: 'viridis' },
+            legend: showLegend ? { orient: legendOrient } : null
+          },
         },
+      };
+
+    case 'heatlane':
+      // Heat lane chart - horizontal lanes with color intensity
+      return {
+        ...baseSpec,
+        mark: { type: 'rect', tooltip: true },
+        encoding: {
+          y: { field: config.xField, type: 'nominal', axis: { title: config.xField } },
+          x: { field: config.yField, type: 'ordinal', axis: { labelAngle: 0, title: config.yField } },
+          color: { 
+            field: config.colorField || config.yField, 
+            type: 'quantitative', 
+            scale: { scheme: 'redyellowgreen', reverse: false },
+            legend: showLegend ? { 
+              orient: legendOrient,
+              title: 'Intensity'
+            } : null
+          },
+        },
+        config: {
+          ...baseSpec.config,
+          mark: { tooltip: { content: 'data' } }
+        }
       };
 
     case 'boxplot':

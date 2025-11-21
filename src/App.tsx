@@ -38,7 +38,7 @@ function App() {
   const [fieldMappings, setFieldMappings] = useState<FieldMapping[]>([]);
   
   const [vizType, setVizType] = useState('bar');
-  const [barStyle, setBarStyle] = useState<'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt'>('simple');
+  const [barStyle, setBarStyle] = useState<'simple' | 'stacked' | 'grouped' | 'diverging' | 'gantt' | 'diverging-stacked'>('simple');
   const [xField, setXField] = useState('category');
   const [yField, setYField] = useState('value');
   const [colorField, setColorField] = useState('__none__');
@@ -59,6 +59,10 @@ function App() {
   const [xField2, setXField2] = useState('__none__'); // For Gantt charts
   const [showReferenceLine, setShowReferenceLine] = useState(false);
   const [referenceLine, setReferenceLine] = useState(0);
+  
+  // Legend controls
+  const [legendPosition, setLegendPosition] = useState<'none' | 'left' | 'right' | 'top' | 'bottom'>('right');
+  const [legendMode, setLegendMode] = useState<'inline' | 'table' | 'popup'>('table');
 
   // Parse data whenever inputs change
   const parsedData = useMemo(() => {
@@ -149,12 +153,14 @@ function App() {
         xField2: vizType === 'bar' && xField2 !== '__none__' ? xField2 : undefined,
         showReferenceLine: vizType === 'bar' ? showReferenceLine : undefined,
         referenceLine: vizType === 'bar' ? referenceLine : undefined,
+        legendPosition,
+        legendMode,
       });
     } catch (error) {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, legendPosition, legendMode]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
@@ -403,6 +409,10 @@ function App() {
                         onShowReferenceLineChange={setShowReferenceLine}
                         referenceLine={referenceLine}
                         onReferenceLineChange={setReferenceLine}
+                        legendPosition={legendPosition}
+                        onLegendPositionChange={setLegendPosition}
+                        legendMode={legendMode}
+                        onLegendModeChange={setLegendMode}
                       />
                     </div>
                   </div>
