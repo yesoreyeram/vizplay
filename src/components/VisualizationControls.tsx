@@ -2,12 +2,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2, BarChart4, Layers } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2 } from 'lucide-react';
 
 const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   bar: BarChart3,
-  'stacked-bar': Layers,
-  'grouped-bar': BarChart4,
   line: TrendingUp,
   area: AreaChart,
   scatter: Circle,
@@ -31,6 +29,8 @@ interface VisualizationControlsProps {
   title: string;
   onTitleChange: (title: string) => void;
   availableFields: string[];
+  barStyle: string;
+  onBarStyleChange: (style: 'simple' | 'stacked' | 'grouped') => void;
 }
 
 export function VisualizationControls({
@@ -47,6 +47,8 @@ export function VisualizationControls({
   title,
   onTitleChange,
   availableFields,
+  barStyle,
+  onBarStyleChange,
 }: VisualizationControlsProps) {
   return (
     <div className="h-full flex flex-col p-3 space-y-3 overflow-y-auto">
@@ -81,6 +83,22 @@ export function VisualizationControls({
           </div>
         </div>
       </div>
+
+      {vizType === 'bar' && (
+        <div className="space-y-1.5">
+          <Label htmlFor="bar-style" className="text-xs">Bar Style</Label>
+          <Select value={barStyle} onValueChange={onBarStyleChange}>
+            <SelectTrigger id="bar-style" className="h-8 text-sm">
+              <SelectValue placeholder="Select bar style" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover">
+              <SelectItem value="simple">Simple - Single bars</SelectItem>
+              <SelectItem value="stacked">Stacked - Show composition</SelectItem>
+              <SelectItem value="grouped">Grouped - Compare side-by-side</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="chart-title" className="text-xs">Chart Title</Label>
@@ -125,10 +143,10 @@ export function VisualizationControls({
         </Select>
       </div>
 
-      {['scatter', 'bar', 'line', 'stacked-bar', 'grouped-bar'].includes(vizType) && (
+      {['scatter', 'bar', 'line'].includes(vizType) && (
         <div className="space-y-1.5">
           <Label htmlFor="color-field" className="text-xs">
-            Color Field {['stacked-bar', 'grouped-bar'].includes(vizType) ? '(required for grouping)' : '(optional)'}
+            Color Field {vizType === 'bar' && barStyle !== 'simple' ? '(required for grouping)' : '(optional)'}
           </Label>
           <Select value={colorField} onValueChange={onColorFieldChange}>
             <SelectTrigger id="color-field" className="h-8 text-sm">

@@ -38,6 +38,7 @@ function App() {
   const [fieldMappings, setFieldMappings] = useState<FieldMapping[]>([]);
   
   const [vizType, setVizType] = useState('bar');
+  const [barStyle, setBarStyle] = useState<'simple' | 'stacked' | 'grouped'>('simple');
   const [xField, setXField] = useState('category');
   const [yField, setYField] = useState('value');
   const [colorField, setColorField] = useState('__none__');
@@ -121,12 +122,13 @@ function App() {
         colorField: colorField && colorField !== '__none__' ? colorField : undefined,
         sizeField: sizeField && sizeField !== '__none__' ? sizeField : undefined,
         title: chartTitle,
+        barStyle: vizType === 'bar' ? barStyle : undefined,
       });
     } catch (error) {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
@@ -139,17 +141,25 @@ function App() {
       setVizType(dataset.vizConfig.type);
       setChartTitle(dataset.vizConfig.title || `${dataset.name} Visualization`);
       
+      // Set bar style if provided
+      if (dataset.vizConfig?.barStyle) {
+        setBarStyle(dataset.vizConfig.barStyle);
+      } else {
+        setBarStyle('simple');
+      }
+      
       // Set fields after a short delay to ensure data is parsed
       setTimeout(() => {
-        if (dataset.vizConfig.xField) setXField(dataset.vizConfig.xField);
-        if (dataset.vizConfig.yField) setYField(dataset.vizConfig.yField);
-        if (dataset.vizConfig.colorField) setColorField(dataset.vizConfig.colorField);
+        if (dataset.vizConfig?.xField) setXField(dataset.vizConfig.xField);
+        if (dataset.vizConfig?.yField) setYField(dataset.vizConfig.yField);
+        if (dataset.vizConfig?.colorField) setColorField(dataset.vizConfig.colorField);
         else setColorField('__none__');
-        if (dataset.vizConfig.sizeField) setSizeField(dataset.vizConfig.sizeField);
+        if (dataset.vizConfig?.sizeField) setSizeField(dataset.vizConfig.sizeField);
         else setSizeField('__none__');
       }, 100);
     } else {
       setChartTitle(`${dataset.name} Visualization`);
+      setBarStyle('simple');
     }
   };
 
@@ -263,6 +273,8 @@ function App() {
                         title={chartTitle}
                         onTitleChange={setChartTitle}
                         availableFields={availableFields}
+                        barStyle={barStyle}
+                        onBarStyleChange={setBarStyle}
                       />
                     </div>
                   </div>

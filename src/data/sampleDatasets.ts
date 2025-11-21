@@ -15,6 +15,7 @@ export interface Dataset {
     colorField?: string;
     sizeField?: string;
     title?: string;
+    barStyle?: 'simple' | 'stacked' | 'grouped';
   };
 }
 
@@ -40,6 +41,7 @@ export const sampleDatasets: Dataset[] = [
       xField: 'product',
       yField: 'sales',
       title: 'Product Sales Comparison',
+      barStyle: 'simple',
     }
   },
   {
@@ -64,11 +66,12 @@ export const sampleDatasets: Dataset[] = [
       { quarter: 'Q4', category: 'Food', revenue: 82000 },
     ], null, 2),
     vizConfig: {
-      type: 'stacked-bar',
+      type: 'bar',
       xField: 'quarter',
       yField: 'revenue',
       colorField: 'category',
       title: 'Quarterly Revenue by Category (Stacked)',
+      barStyle: 'stacked',
     }
   },
   {
@@ -93,11 +96,12 @@ export const sampleDatasets: Dataset[] = [
       { region: 'West', product: 'Product C', sales: 41000 },
     ], null, 2),
     vizConfig: {
-      type: 'grouped-bar',
+      type: 'bar',
       xField: 'region',
       yField: 'sales',
       colorField: 'product',
       title: 'Sales by Region and Product (Grouped)',
+      barStyle: 'grouped',
     }
   },
   {
