@@ -8,7 +8,7 @@ A modern, enterprise-grade data visualization playground built with React, TypeS
 - **Data Input & Parsing**: Support for multiple formats (JSON, CSV, TSV, XML, YAML)
 - **Data Transformation**: JSONata expressions for powerful data manipulation
 - **Field Mapping**: Define field types and mappings (string, number, boolean, datetime, etc.)
-- **Multiple Visualizations**: Bar charts, line charts, scatter plots, pie charts, area charts, and heatmaps
+- **Multiple Visualizations**: Bar charts, line charts, scatter plots, pie charts, area charts, heatmaps, tree maps, and more
 - **500+ Sample Datasets**: Comprehensive dataset library across 14 categories
 - **Modern UI**: Built with Tailwind CSS and shadcn/ui components
 
