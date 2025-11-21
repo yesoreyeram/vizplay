@@ -442,33 +442,29 @@ export function generateVegaSpec(
         sortedData.sort((a, b) => b[config.yField!] - a[config.yField!]);
       }
 
-      // Calculate conversion rates, percentages, and bar offsets for centering
+      // Calculate conversion rates and percentages
       const maxValue = Math.max(...sortedData.map(d => d[config.yField!]));
-      const processedData = sortedData.map((d, i) => {
-        const value = d[config.yField!];
-        const percentage = (value / maxValue) * 100;
-        
-        return {
-          ...d,
-          percentage: percentage.toFixed(1),
-          conversionRate: i > 0 
-            ? ((value / sortedData[i - 1][config.yField!]) * 100).toFixed(1)
-            : '100.0',
-          order: i,
-          // Calculate bar size ratio for funnel effect (0-1 scale)
-          barSizeRatio: value / maxValue
-        };
-      });
+      const processedData = sortedData.map((d, i) => ({
+        ...d,
+        percentage: ((d[config.yField!] / maxValue) * 100).toFixed(1),
+        conversionRate: i > 0 
+          ? ((d[config.yField!] / sortedData[i - 1][config.yField!]) * 100).toFixed(1)
+          : '100.0',
+        order: i,
+      }));
 
       const isHorizontal = funnelOrientation === 'horizontal';
 
-      // For funnel, we'll use rect marks with calculated positions to achieve center alignment
+      // Build the layers for funnel visualization using stack: "center" for proper funnel effect
+      const layers: any[] = [];
+
+      // Main funnel layer using bar marks with stack: "center"
       const funnelLayer: any = {
         data: { values: processedData },
         mark: { 
-          type: 'rect',
+          type: 'bar', 
           tooltip: true,
-          cornerRadius: 2
+          cornerRadiusEnd: 2
         },
         encoding: isHorizontal ? {
           y: { 
@@ -482,22 +478,11 @@ export function generateVegaSpec(
             }
           },
           x: { 
-            datum: 0,
+            field: config.yField, 
             type: 'quantitative',
+            stack: 'center',  // This creates the centered funnel effect!
             axis: { title: config.yField },
             scale: { domain: [0, maxValue * 1.1] }
-          },
-          x2: { 
-            field: config.yField,
-            type: 'quantitative'
-          },
-          // Use yOffset to center the bars vertically based on value
-          yOffset: {
-            expr: `scale('y', datum.${config.xField}) + bandwidth('y') / 2 * (1 - datum.barSizeRatio)`
-          },
-          // Adjust height based on value for funnel effect
-          height: {
-            expr: `bandwidth('y') * datum.barSizeRatio`
           },
           color: config.colorField && config.colorField !== '__none__'
             ? { 
@@ -526,22 +511,11 @@ export function generateVegaSpec(
             }
           },
           y: { 
-            datum: 0,
+            field: config.yField, 
             type: 'quantitative',
+            stack: 'center',  // This creates the centered funnel effect!
             axis: { title: config.yField },
             scale: { domain: [0, maxValue * 1.1] }
-          },
-          y2: { 
-            field: config.yField,
-            type: 'quantitative'
-          },
-          // Use xOffset to center the bars horizontally based on value
-          xOffset: {
-            expr: `scale('x', datum.${config.xField}) + bandwidth('x') / 2 * (1 - datum.barSizeRatio)`
-          },
-          // Adjust width based on value for funnel effect
-          width: {
-            expr: `bandwidth('x') * datum.barSizeRatio`
           },
           color: config.colorField && config.colorField !== '__none__'
             ? { 
@@ -560,8 +534,7 @@ export function generateVegaSpec(
               }
         }
       };
-
-      const layers: any[] = [funnelLayer];
+      layers.push(funnelLayer);
 
       // Add text labels if requested
       if (funnelLabelType !== 'none') {
@@ -584,8 +557,8 @@ export function generateVegaSpec(
             x: { 
               field: config.yField, 
               type: 'quantitative',
-              scale: { domain: [0, maxValue * 1.1] },
-              aggregate: 'mean'
+              stack: 'center',
+              scale: { domain: [0, maxValue * 1.1] }
             },
             text: { 
               field: funnelLabelType === 'value' ? config.yField 
@@ -602,8 +575,8 @@ export function generateVegaSpec(
             y: { 
               field: config.yField, 
               type: 'quantitative',
-              scale: { domain: [0, maxValue * 1.1] },
-              aggregate: 'mean'
+              stack: 'center',
+              scale: { domain: [0, maxValue * 1.1] }
             },
             text: { 
               field: funnelLabelType === 'value' ? config.yField 
