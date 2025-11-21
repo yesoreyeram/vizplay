@@ -1125,28 +1125,3 @@ export const sampleDatasets: Dataset[] = [
     ], null, 2)
   }
 ];
-
-// Generate additional datasets programmatically to reach 500+
-const categories = ['Business', 'Finance', 'Technology', 'Health', 'Education', 'Environment', 'Sports', 'E-commerce', 'Entertainment', 'Food'];
-const baseNames = ['Analysis', 'Report', 'Survey', 'Study', 'Research', 'Metrics', 'Statistics', 'Data', 'Trends', 'Insights'];
-
-for (let i = 0; i < 480; i++) {
-  const category = categories[i % categories.length];
-  const baseName = baseNames[Math.floor(i / 10) % baseNames.length];
-  
-  sampleDatasets.push({
-    id: `dataset-${i + 100}`,
-    name: `${category} ${baseName} ${i + 1}`,
-    description: `Sample ${category.toLowerCase()} dataset for visualization testing`,
-    category,
-    tags: [category.toLowerCase(), baseName.toLowerCase(), 'sample'],
-    format: 'json',
-    data: JSON.stringify([
-      { x: 10 + i, y: Math.floor(Math.random() * 100), z: Math.floor(Math.random() * 50) },
-      { x: 20 + i, y: Math.floor(Math.random() * 100), z: Math.floor(Math.random() * 50) },
-      { x: 30 + i, y: Math.floor(Math.random() * 100), z: Math.floor(Math.random() * 50) },
-      { x: 40 + i, y: Math.floor(Math.random() * 100), z: Math.floor(Math.random() * 50) },
-      { x: 50 + i, y: Math.floor(Math.random() * 100), z: Math.floor(Math.random() * 50) },
-    ], null, 2)
-  });
-}

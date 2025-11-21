@@ -96,38 +96,48 @@ export function VisualizationControls({
   onReferenceLineChange,
 }: VisualizationControlsProps) {
   return (
-    <div className="h-full flex flex-col p-3 space-y-3 overflow-y-auto">
-      <div className="flex items-center gap-2 pb-1.5 border-b">
-        <BarChart3 className="h-4 w-4 text-primary" />
-        <h3 className="font-semibold text-sm">Visualization Configuration</h3>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label className="text-xs">Visualization Type</Label>
-        <div className="overflow-x-auto pb-2">
-          <div className="flex gap-2 min-w-max">
-            {visualizationTypes.map(type => {
-              const Icon = vizIcons[type.id] || BarChart3;
-              const isSelected = vizType === type.id;
-              return (
-                <button
-                  key={type.id}
-                  onClick={() => onVizTypeChange(type.id)}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all min-w-[90px] ${
-                    isSelected
-                      ? 'bg-primary/10 border-primary text-primary'
-                      : 'bg-card border-border hover:bg-accent hover:border-accent-foreground/20'
-                  }`}
-                  title={type.description}
-                >
-                  <Icon className={`h-5 w-5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className="text-xs font-medium text-center leading-tight">{type.name}</span>
-                </button>
-              );
-            })}
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Sticky header and viz type picker */}
+      <div className="sticky top-0 z-10 bg-background border-b">
+        <div className="p-3 pb-2">
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            <h3 className="font-semibold text-sm">Visualization Configuration</h3>
+          </div>
+        </div>
+        
+        <div className="px-3 pb-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs">Visualization Type</Label>
+            <div className="overflow-x-auto pb-2">
+              <div className="flex gap-2 min-w-max">
+                {visualizationTypes.map(type => {
+                  const Icon = vizIcons[type.id] || BarChart3;
+                  const isSelected = vizType === type.id;
+                  return (
+                    <button
+                      key={type.id}
+                      onClick={() => onVizTypeChange(type.id)}
+                      className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all min-w-[90px] ${
+                        isSelected
+                          ? 'bg-primary/10 border-primary text-primary'
+                          : 'bg-card border-border hover:bg-accent hover:border-accent-foreground/20'
+                      }`}
+                      title={type.description}
+                    >
+                      <Icon className={`h-5 w-5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className="text-xs font-medium text-center leading-tight">{type.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto p-3 pt-0 space-y-3">
 
       {vizType === 'bar' && (
         <>
@@ -408,6 +418,7 @@ export function VisualizationControls({
           </Select>
         </div>
       )}
+      </div>
     </div>
   );
 }

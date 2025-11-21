@@ -341,6 +341,22 @@ function App() {
           {/* Right Panel - Visualization */}
           <Panel defaultSize={50} minSize={30}>
             <PanelGroup direction="vertical">
+              {/* Visualization Render */}
+              <Panel defaultSize={65} minSize={30}>
+                <div className="h-full">
+                  <div className="h-full flex flex-col">
+                    <div className="border-b p-2.5">
+                      <h2 className="font-semibold text-sm">Visualization Output</h2>
+                    </div>
+                    <div className="flex-1 overflow-hidden bg-card">
+                      <VisualizationRender spec={vegaSpec} />
+                    </div>
+                  </div>
+                </div>
+              </Panel>
+              
+              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
+              
               {/* Visualization Controls */}
               <Panel defaultSize={35} minSize={20}>
                 <div className="h-full">
@@ -388,22 +404,6 @@ function App() {
                         referenceLine={referenceLine}
                         onReferenceLineChange={setReferenceLine}
                       />
-                    </div>
-                  </div>
-                </div>
-              </Panel>
-              
-              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
-              
-              {/* Visualization Render */}
-              <Panel defaultSize={65} minSize={30}>
-                <div className="h-full">
-                  <div className="h-full flex flex-col">
-                    <div className="border-b p-2.5">
-                      <h2 className="font-semibold text-sm">Visualization Output</h2>
-                    </div>
-                    <div className="flex-1 overflow-hidden bg-card">
-                      <VisualizationRender spec={vegaSpec} />
                     </div>
                   </div>
                 </div>

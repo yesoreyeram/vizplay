@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { sampleDatasets } from '@/data/sampleDatasets';
 import type { Dataset } from '@/data/sampleDatasets';
 import { Database, Search, Tag } from 'lucide-react';
@@ -58,25 +59,24 @@ export function DatasetDialog({ onLoadDataset }: DatasetDialogProps) {
                 className="pl-9 h-8 text-sm"
               />
             </div>
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex gap-1.5 flex-wrap">
-            {categories.map(category => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="h-7 text-xs px-2.5"
-              >
-                {category}
-              </Button>
-            ))}
+            <div className="w-48">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover">
+                  {categories.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Dataset Grid */}
-          <div className="flex-1 overflow-y-auto max-h-[calc(85vh-200px)]">
+          <div className="flex-1 overflow-y-auto max-h-[calc(85vh-160px)]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredDatasets.map(dataset => (
                 <div
