@@ -72,6 +72,7 @@ function App() {
   const [funnelLabelType, setFunnelLabelType] = useState<'none' | 'value' | 'percentage' | 'both'>('value');
   const [funnelShowConversionRate, setFunnelShowConversionRate] = useState(false);
   const [funnelGap, setFunnelGap] = useState(0);
+  const [funnelColorScheme, setFunnelColorScheme] = useState<'blue' | 'green' | 'red' | 'purple' | 'orange' | 'redgreen' | 'greenred'>('blue');
 
   // Custom viz builder config for custom visualization type
   const [customVizConfig, setCustomVizConfig] = useState<CustomVizConfig>({ layers: [] });
@@ -109,12 +110,13 @@ function App() {
         funnelLabelType,
         funnelShowConversionRate,
         funnelGap,
+        funnelColorScheme,
       };
     }
   }, [vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation,
       stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient,
       xField2, showReferenceLine, referenceLine, legendPosition, legendMode,
-      funnelOrientation, funnelDirection, funnelLabelType, funnelShowConversionRate, funnelGap]);
+      funnelOrientation, funnelDirection, funnelLabelType, funnelShowConversionRate, funnelGap, funnelColorScheme]);
 
   // Auto-migrate to custom viz when switching from another chart type
   useEffect(() => {
@@ -247,6 +249,7 @@ function App() {
         funnelLabelType: vizType === 'funnel' ? funnelLabelType : undefined,
         funnelShowConversionRate: vizType === 'funnel' ? funnelShowConversionRate : undefined,
         funnelGap: vizType === 'funnel' ? funnelGap : undefined,
+        funnelColorScheme: vizType === 'funnel' ? funnelColorScheme : undefined,
         legendPosition,
         legendMode,
         customVizConfig: vizType === 'custom' ? customVizConfig : undefined,
@@ -255,7 +258,7 @@ function App() {
       console.error('Spec generation error:', error);
       return null;
     }
-  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, funnelOrientation, funnelDirection, funnelLabelType, funnelShowConversionRate, funnelGap, legendPosition, legendMode, customVizConfig]);
+  }, [parsedData, vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, xField2, showReferenceLine, referenceLine, funnelOrientation, funnelDirection, funnelLabelType, funnelShowConversionRate, funnelGap, funnelColorScheme, legendPosition, legendMode, customVizConfig]);
 
   const handleLoadDataset = (dataset: Dataset) => {
     setSampleDatasetData(dataset.data);
@@ -371,6 +374,11 @@ function App() {
         setFunnelGap(dataset.vizConfig.funnelGap);
       } else {
         setFunnelGap(0);
+      }
+      if (dataset.vizConfig?.funnelColorScheme) {
+        setFunnelColorScheme(dataset.vizConfig.funnelColorScheme);
+      } else {
+        setFunnelColorScheme('blue');
       }
       
       // Set fields after a short delay to ensure data is parsed
@@ -566,6 +574,8 @@ function App() {
                         onFunnelShowConversionRateChange={setFunnelShowConversionRate}
                         funnelGap={funnelGap}
                         onFunnelGapChange={setFunnelGap}
+                        funnelColorScheme={funnelColorScheme}
+                        onFunnelColorSchemeChange={setFunnelColorScheme}
                       />
                     </div>
                   </div>

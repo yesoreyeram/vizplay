@@ -79,6 +79,8 @@ interface VisualizationControlsProps {
   onFunnelShowConversionRateChange: (show: boolean) => void;
   funnelGap: number;
   onFunnelGapChange: (gap: number) => void;
+  funnelColorScheme: 'blue' | 'green' | 'red' | 'purple' | 'orange' | 'redgreen' | 'greenred';
+  onFunnelColorSchemeChange: (scheme: 'blue' | 'green' | 'red' | 'purple' | 'orange' | 'redgreen' | 'greenred') => void;
 }
 
 export function VisualizationControls({
@@ -135,6 +137,8 @@ export function VisualizationControls({
   onFunnelShowConversionRateChange,
   funnelGap,
   onFunnelGapChange,
+  funnelColorScheme,
+  onFunnelColorSchemeChange,
 }: VisualizationControlsProps) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -458,6 +462,24 @@ export function VisualizationControls({
               placeholder="0"
               className="h-8 text-sm"
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="funnel-color-scheme" className="text-xs">Color Scheme</Label>
+            <Select value={funnelColorScheme} onValueChange={onFunnelColorSchemeChange}>
+              <SelectTrigger id="funnel-color-scheme" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                <SelectItem value="blue">Blue Gradient</SelectItem>
+                <SelectItem value="green">Green Gradient</SelectItem>
+                <SelectItem value="red">Red Gradient</SelectItem>
+                <SelectItem value="purple">Purple Gradient</SelectItem>
+                <SelectItem value="orange">Orange Gradient</SelectItem>
+                <SelectItem value="redgreen">Red → Green (Improvement)</SelectItem>
+                <SelectItem value="greenred">Green → Red (Decline)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </>
       )}

@@ -32,6 +32,7 @@ export interface VisualizationConfig {
   funnelLabelType?: 'none' | 'value' | 'percentage' | 'both';
   funnelShowConversionRate?: boolean;
   funnelGap?: number;
+  funnelColorScheme?: 'blue' | 'green' | 'red' | 'purple' | 'orange' | 'redgreen' | 'greenred';
 }
 
 export const visualizationTypes = [
@@ -432,13 +433,14 @@ export function generateVegaSpec(
       const funnelDirection = config.funnelDirection || 'normal';
       const funnelLabelType = config.funnelLabelType || 'value';
       const funnelShowConversionRate = config.funnelShowConversionRate || false;
+      const funnelColorScheme = config.funnelColorScheme || 'blue';
 
-      // Sort data based on direction
+      // IMPORTANT: Preserve original data order for funnels!
+      // Funnel stages should appear in the order defined in the data.
+      // Only reverse the array for "reversed" funnels (expansion funnels).
       const sortedData = [...data];
       if (funnelDirection === 'reversed') {
-        sortedData.sort((a, b) => a[config.yField!] - b[config.yField!]);
-      } else {
-        sortedData.sort((a, b) => b[config.yField!] - a[config.yField!]);
+        sortedData.reverse();
       }
 
       // Calculate conversion rates and percentages
@@ -453,6 +455,33 @@ export function generateVegaSpec(
       }));
 
       const isHorizontal = funnelOrientation === 'horizontal';
+
+      // Determine color scheme
+      let colorScheme: string;
+      let colorRange: string[] | undefined;
+      
+      switch (funnelColorScheme) {
+        case 'green':
+          colorScheme = 'greens';
+          break;
+        case 'red':
+          colorScheme = 'reds';
+          break;
+        case 'purple':
+          colorScheme = 'purples';
+          break;
+        case 'orange':
+          colorScheme = 'oranges';
+          break;
+        case 'redgreen':
+          colorRange = ['#dc2626', '#f59e0b', '#fbbf24', '#84cc16', '#22c55e'];
+          break;
+        case 'greenred':
+          colorRange = ['#22c55e', '#84cc16', '#fbbf24', '#f59e0b', '#dc2626'];
+          break;
+        default:
+          colorScheme = 'blues';
+      }
 
       // Build the layers for funnel visualization using stack: "center" for proper funnel effect
       const layers: any[] = [];
@@ -483,20 +512,18 @@ export function generateVegaSpec(
             axis: { title: config.yField },
             scale: { domain: [0, maxValue * 1.1] }
           },
-          color: config.colorField && config.colorField !== '__none__'
-            ? { 
-                field: config.colorField, 
-                type: config.colorField === config.yField ? 'quantitative' : 'nominal',
-                scale: config.colorField === config.yField 
-                  ? { scheme: 'blues', reverse: funnelDirection === 'normal' }
-                  : { scheme: 'category10' },
-                legend: showLegend ? { orient: legendOrient } : null
-              }
-            : { 
+          color: colorRange 
+            ? {
                 field: config.yField,
                 type: 'quantitative',
-                scale: { scheme: 'blues', reverse: funnelDirection === 'normal' },
-                legend: showLegend ? { orient: legendOrient } : null
+                scale: { range: colorRange },
+                legend: showLegend ? { orient: legendOrient, title: config.yField } : null
+              }
+            : {
+                field: config.yField,
+                type: 'quantitative',
+                scale: { scheme: colorScheme, reverse: funnelDirection === 'normal' },
+                legend: showLegend ? { orient: legendOrient, title: config.yField } : null
               }
         } : {
           x: { 
@@ -516,20 +543,18 @@ export function generateVegaSpec(
             axis: { title: config.yField },
             scale: { domain: [0, maxValue * 1.1] }
           },
-          color: config.colorField && config.colorField !== '__none__'
-            ? { 
-                field: config.colorField, 
-                type: config.colorField === config.yField ? 'quantitative' : 'nominal',
-                scale: config.colorField === config.yField 
-                  ? { scheme: 'blues', reverse: funnelDirection === 'normal' }
-                  : { scheme: 'category10' },
-                legend: showLegend ? { orient: legendOrient } : null
-              }
-            : { 
+          color: colorRange 
+            ? {
                 field: config.yField,
                 type: 'quantitative',
-                scale: { scheme: 'blues', reverse: funnelDirection === 'normal' },
-                legend: showLegend ? { orient: legendOrient } : null
+                scale: { range: colorRange },
+                legend: showLegend ? { orient: legendOrient, title: config.yField } : null
+              }
+            : {
+                field: config.yField,
+                type: 'quantitative',
+                scale: { scheme: colorScheme, reverse: funnelDirection === 'normal' },
+                legend: showLegend ? { orient: legendOrient, title: config.yField } : null
               }
         }
       };
