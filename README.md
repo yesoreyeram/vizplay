@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# VizPlay - Enterprise Data Visualization Playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, enterprise-grade data visualization playground built with React, TypeScript, and Vega-Lite.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Split Panel Interface**: Adjustable horizontal and vertical panels for optimal workspace organization
+- **Data Input & Parsing**: Support for multiple formats (JSON, CSV, TSV, XML, YAML)
+- **Data Transformation**: JSONata expressions for powerful data manipulation
+- **Field Mapping**: Define field types and mappings (string, number, boolean, datetime, etc.)
+- **Multiple Visualizations**: Bar charts, line charts, scatter plots, pie charts, area charts, and heatmaps
+- **500+ Sample Datasets**: Comprehensive dataset library across 14 categories
+- **Modern UI**: Built with Tailwind CSS and shadcn/ui components
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 19** with TypeScript
+- **Vite 7** for blazing-fast builds
+- **Tailwind CSS 4** for styling
+- **shadcn/ui** components (Radix UI primitives)
+- **Vega-Lite** for declarative visualizations
+- **JSONata** for data transformation
+- **PapaParse** for CSV/TSV parsing
+- **js-yaml** for YAML parsing
+- **xml-js** for XML parsing
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Install dependencies
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Start development server
+npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Build for production
+npm run build
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Preview production build
+npm run preview
+
+# Run linter
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Usage
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **Input Data**: Enter your data in the left panel (top section)
+2. **Configure Parsing**: Select format, add JSONata transformations, and define field mappings (left panel, bottom section)
+3. **Select Visualization**: Choose chart type and configure axes (right panel, top section)
+4. **View Results**: See your visualization in real-time (right panel, bottom section)
+5. **Load Samples**: Click "Load Sample Dataset" to explore 504 pre-built datasets
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
+
 ```
+src/
+├── components/          # React components
+│   ├── ui/             # shadcn/ui components
+│   ├── TopNavbar.tsx
+│   ├── BottomNavbar.tsx
+│   ├── DataInputSection.tsx
+│   ├── DataParsingControls.tsx
+│   ├── VisualizationControls.tsx
+│   ├── VisualizationRender.tsx
+│   └── DatasetDialog.tsx
+├── data/               # Sample datasets
+│   └── sampleDatasets.ts
+├── lib/                # Utilities and helpers
+│   ├── dataParser.ts
+│   └── visualizations/
+│       └── vegaSpecs.ts
+└── App.tsx             # Main application
+```
+
+## License
+
+See LICENSE file for details.
