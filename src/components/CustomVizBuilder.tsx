@@ -25,6 +25,7 @@ export interface VizLayer {
     opacity?: { field: string; type: string };
     shape?: { field: string; type: string };
     text?: { field: string; type: string };
+    theta?: { field: string; type: string; aggregate?: string; stack?: boolean };
     tooltip?: Array<{ field: string; type: string }>;
   };
   transform?: Array<{

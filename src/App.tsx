@@ -71,46 +71,54 @@ function App() {
 
   // Track previous viz type for migration
   const prevVizTypeRef = useRef<string>(vizType);
+  const configSnapshotRef = useRef<any>(null);
+
+  // Capture config snapshot whenever non-custom viz type changes
+  useEffect(() => {
+    if (vizType !== 'custom') {
+      configSnapshotRef.current = {
+        type: vizType,
+        xField,
+        yField,
+        colorField: colorField !== '__none__' ? colorField : undefined,
+        sizeField: sizeField !== '__none__' ? sizeField : undefined,
+        title: chartTitle,
+        barStyle,
+        barOrientation,
+        stackNormalize,
+        xAxisSort,
+        stackSort,
+        topN,
+        showTextLabels,
+        aggregateOp,
+        colorGradient,
+        xField2: xField2 !== '__none__' ? xField2 : undefined,
+        showReferenceLine,
+        referenceLine,
+        legendPosition,
+        legendMode,
+      };
+    }
+  }, [vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation,
+      stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient,
+      xField2, showReferenceLine, referenceLine, legendPosition, legendMode]);
 
   // Auto-migrate to custom viz when switching from another chart type
   useEffect(() => {
     const prevVizType = prevVizTypeRef.current;
     
     // Only migrate if switching TO custom AND FROM a non-custom type
-    if (vizType === 'custom' && prevVizType !== 'custom' && prevVizType !== '') {
+    if (vizType === 'custom' && prevVizType !== 'custom' && prevVizType !== '' && configSnapshotRef.current) {
       // Only auto-migrate if custom config is empty (hasn't been manually set)
       if (customVizConfig.layers.length === 0) {
-        const migratedConfig = migrateToCustomViz({
-          type: prevVizType,
-          xField,
-          yField,
-          colorField: colorField !== '__none__' ? colorField : undefined,
-          sizeField: sizeField !== '__none__' ? sizeField : undefined,
-          title: chartTitle,
-          barStyle,
-          barOrientation,
-          stackNormalize,
-          xAxisSort,
-          stackSort,
-          topN,
-          showTextLabels,
-          aggregateOp,
-          colorGradient,
-          xField2: xField2 !== '__none__' ? xField2 : undefined,
-          showReferenceLine,
-          referenceLine,
-          legendPosition,
-          legendMode,
-        });
+        const migratedConfig = migrateToCustomViz(configSnapshotRef.current);
         setCustomVizConfig(migratedConfig);
       }
     }
     
     // Update the previous viz type
     prevVizTypeRef.current = vizType;
-  }, [vizType, xField, yField, colorField, sizeField, chartTitle, barStyle, barOrientation, 
-      stackNormalize, xAxisSort, stackSort, topN, showTextLabels, aggregateOp, colorGradient, 
-      xField2, showReferenceLine, referenceLine, legendPosition, legendMode, customVizConfig.layers.length]);
+  }, [vizType, customVizConfig.layers.length]);
 
 
   // Parse data whenever inputs change

@@ -48,7 +48,7 @@ export function migrateToCustomViz(config: VisualizationConfig): CustomVizConfig
 
 function createBasicLayer(config: VisualizationConfig): VizLayer {
   const layer: VizLayer = {
-    id: `layer-${Date.now()}`,
+    id: `layer-${crypto.randomUUID()}`,
     mark: 'bar',
     markOptions: { tooltip: true },
     encodings: {},
@@ -73,13 +73,12 @@ function migrateBarChart(config: VisualizationConfig): VizLayer[] {
   const barOrientation = config.barOrientation || 'vertical';
   const isHorizontal = barOrientation === 'horizontal';
   const showTextLabels = config.showTextLabels || false;
-  const showReferenceLine = config.showReferenceLine || false;
   const aggregateOp = config.aggregateOp || 'none';
   const colorGradient = config.colorGradient || false;
 
   // Create main bar layer
   const barLayer: VizLayer = {
-    id: `layer-bar-${Date.now()}`,
+    id: `layer-bar-${crypto.randomUUID()}`,
     mark: 'bar',
     markOptions: { tooltip: true },
     encodings: {},
@@ -167,7 +166,7 @@ function migrateBarChart(config: VisualizationConfig): VizLayer[] {
   // Add text labels layer if enabled
   if (showTextLabels && config.yField) {
     const textLayer: VizLayer = {
-      id: `layer-text-${Date.now()}`,
+      id: `layer-text-${crypto.randomUUID()}`,
       mark: 'text',
       markOptions: {
         color: '#e5e7eb',
@@ -181,29 +180,15 @@ function migrateBarChart(config: VisualizationConfig): VizLayer[] {
     layers.push(textLayer);
   }
 
-  // Add reference line layer if enabled
-  if (showReferenceLine && config.referenceLine !== undefined) {
-    const refLayer: VizLayer = {
-      id: `layer-ref-${Date.now()}`,
-      mark: 'rule',
-      markOptions: {
-        color: '#fbbf24',
-      },
-      encodings: isHorizontal ? {
-        x: { field: String(config.referenceLine), type: 'quantitative' },
-      } : {
-        y: { field: String(config.referenceLine), type: 'quantitative' },
-      },
-    };
-    layers.push(refLayer);
-  }
+  // Note: Reference lines are not migrated as they require datum encoding which isn't
+  // supported in the current VizLayer interface
 
   return layers;
 }
 
 function migrateLineChart(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-line-${Date.now()}`,
+    id: `layer-line-${crypto.randomUUID()}`,
     mark: 'line',
     markOptions: { tooltip: true },
     encodings: {},
@@ -221,7 +206,7 @@ function migrateLineChart(config: VisualizationConfig): VizLayer[] {
 
   // Add point markers on the line
   const pointLayer: VizLayer = {
-    id: `layer-point-${Date.now()}`,
+    id: `layer-point-${crypto.randomUUID()}`,
     mark: 'point',
     markOptions: { tooltip: true, filled: true },
     encodings: {
@@ -236,7 +221,7 @@ function migrateLineChart(config: VisualizationConfig): VizLayer[] {
 
 function migrateAreaChart(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-area-${Date.now()}`,
+    id: `layer-area-${crypto.randomUUID()}`,
     mark: 'area',
     markOptions: { tooltip: true },
     encodings: {},
@@ -257,7 +242,7 @@ function migrateAreaChart(config: VisualizationConfig): VizLayer[] {
 
 function migrateScatterChart(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-scatter-${Date.now()}`,
+    id: `layer-scatter-${crypto.randomUUID()}`,
     mark: 'point',
     markOptions: {
       tooltip: true,
@@ -290,14 +275,15 @@ function migrateScatterChart(config: VisualizationConfig): VizLayer[] {
 
 function migratePieChart(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-pie-${Date.now()}`,
+    id: `layer-pie-${crypto.randomUUID()}`,
     mark: 'arc',
     markOptions: { tooltip: true },
     encodings: {},
   };
 
+  // Pie charts use theta encoding for the quantitative value (angle/size)
   if (config.yField) {
-    layer.encodings.text = { field: config.yField, type: 'quantitative' };
+    layer.encodings.theta = { field: config.yField, type: 'quantitative' };
   }
   if (config.xField) {
     layer.encodings.color = { field: config.xField, type: 'nominal' };
@@ -308,7 +294,7 @@ function migratePieChart(config: VisualizationConfig): VizLayer[] {
 
 function migrateHeatmap(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-heatmap-${Date.now()}`,
+    id: `layer-heatmap-${crypto.randomUUID()}`,
     mark: 'rect',
     markOptions: { tooltip: true },
     encodings: {},
@@ -333,7 +319,7 @@ function migrateHeatmap(config: VisualizationConfig): VizLayer[] {
 
 function migrateHeatlane(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-heatlane-${Date.now()}`,
+    id: `layer-heatlane-${crypto.randomUUID()}`,
     mark: 'rect',
     markOptions: { tooltip: true },
     encodings: {},
@@ -364,7 +350,7 @@ function migrateHeatlane(config: VisualizationConfig): VizLayer[] {
 
 function migrateBoxplot(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-boxplot-${Date.now()}`,
+    id: `layer-boxplot-${crypto.randomUUID()}`,
     mark: 'boxplot',
     markOptions: { tooltip: true },
     encodings: {},
@@ -382,7 +368,7 @@ function migrateBoxplot(config: VisualizationConfig): VizLayer[] {
 
 function migrateHistogram(config: VisualizationConfig): VizLayer[] {
   const layer: VizLayer = {
-    id: `layer-histogram-${Date.now()}`,
+    id: `layer-histogram-${crypto.randomUUID()}`,
     mark: 'bar',
     markOptions: { tooltip: true },
     encodings: {},

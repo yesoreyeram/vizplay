@@ -518,6 +518,9 @@ export function generateVegaSpec(
             if (layer.encodings.text) {
               layerSpec.encoding.text = { ...layer.encodings.text };
             }
+            if (layer.encodings.theta) {
+              layerSpec.encoding.theta = { ...layer.encodings.theta };
+            }
             if (layer.encodings.tooltip) {
               layerSpec.encoding.tooltip = layer.encodings.tooltip;
             }
