@@ -89,12 +89,12 @@ export function generateVegaSpec(
     case 'scatter':
       return {
         ...baseSpec,
-        mark: { type: 'point', tooltip: true, filled: true },
+        mark: { type: 'point', tooltip: true, filled: true, size: 100, opacity: 0.8, color: config.colorField ? undefined : '#60a5fa' },
         encoding: {
           x: { field: config.xField, type: 'quantitative' },
           y: { field: config.yField, type: 'quantitative' },
           color: config.colorField ? { field: config.colorField, type: 'nominal' } : undefined,
-          size: config.sizeField ? { field: config.sizeField, type: 'quantitative' } : undefined,
+          size: config.sizeField ? { field: config.sizeField, type: 'quantitative', scale: { range: [50, 400] } } : undefined,
         },
       };
 

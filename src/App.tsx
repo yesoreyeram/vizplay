@@ -72,6 +72,30 @@ function App() {
     }
   }, [availableFields, parsedData, xField, yField]);
 
+  // Auto-select numeric fields when switching to scatter plot
+  useEffect(() => {
+    if (vizType === 'scatter' && parsedData.length > 0) {
+      const numericFields = availableFields.filter(f => {
+        const val = parsedData[0]?.[f];
+        return typeof val === 'number';
+      });
+
+      // If we have at least 2 numeric fields, use them for scatter plot
+      if (numericFields.length >= 2) {
+        // Only update if current fields are not numeric
+        const xVal = parsedData[0]?.[xField];
+        const yVal = parsedData[0]?.[yField];
+        
+        if (typeof xVal !== 'number') {
+          setXField(numericFields[0]);
+        }
+        if (typeof yVal !== 'number') {
+          setYField(numericFields[1] || numericFields[0]);
+        }
+      }
+    }
+  }, [vizType, parsedData, availableFields, xField, yField]);
+
   // Generate Vega spec
   const vegaSpec = useMemo(() => {
     if (parsedData.length === 0 || !xField || !yField) {
