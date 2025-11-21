@@ -2,7 +2,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { visualizationTypes } from '@/lib/visualizations/vegaSpecs';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, TrendingUp, AreaChart, Circle, PieChart, Grid3x3, Box, BarChart2 } from 'lucide-react';
+
+const vizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  bar: BarChart3,
+  line: TrendingUp,
+  area: AreaChart,
+  scatter: Circle,
+  pie: PieChart,
+  heatmap: Grid3x3,
+  boxplot: Box,
+  histogram: BarChart2,
+};
 
 interface VisualizationControlsProps {
   vizType: string;
@@ -43,22 +54,30 @@ export function VisualizationControls({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="viz-type" className="text-xs">Visualization Type</Label>
-        <Select value={vizType} onValueChange={onVizTypeChange}>
-          <SelectTrigger id="viz-type" className="h-8 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-popover">
-            {visualizationTypes.map(type => (
-              <SelectItem key={type.id} value={type.id}>
-                <div className="flex flex-col items-start">
-                  <span className="font-medium text-sm">{type.name}</span>
-                  <span className="text-xs text-muted-foreground leading-tight">{type.description}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Label className="text-xs">Visualization Type</Label>
+        <div className="overflow-x-auto pb-2">
+          <div className="flex gap-2 min-w-max">
+            {visualizationTypes.map(type => {
+              const Icon = vizIcons[type.id] || BarChart3;
+              const isSelected = vizType === type.id;
+              return (
+                <button
+                  key={type.id}
+                  onClick={() => onVizTypeChange(type.id)}
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border transition-all min-w-[90px] ${
+                    isSelected
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-card border-border hover:bg-accent hover:border-accent-foreground/20'
+                  }`}
+                  title={type.description}
+                >
+                  <Icon className={`h-5 w-5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className="text-xs font-medium text-center leading-tight">{type.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-1.5">
