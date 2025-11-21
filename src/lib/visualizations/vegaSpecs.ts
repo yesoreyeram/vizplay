@@ -474,7 +474,7 @@ export function generateVegaSpec(
           y: { 
             field: config.xField, 
             type: 'nominal',
-            sort: processedData.map(d => d[config.xField!]),
+            sort: { field: 'order', order: 'ascending' },
             axis: { title: config.xField }
           },
           color: config.colorField && config.colorField !== '__none__'
@@ -501,7 +501,7 @@ export function generateVegaSpec(
           x: { 
             field: config.xField, 
             type: 'nominal',
-            sort: processedData.map(d => d[config.xField!]),
+            sort: { field: 'order', order: 'ascending' },
             axis: { title: config.xField, labelAngle: -45 }
           },
           color: config.colorField && config.colorField !== '__none__'
@@ -529,7 +529,7 @@ export function generateVegaSpec(
           mark: { type: 'text', align: 'center', baseline: 'middle', dx: isHorizontal ? 20 : 0, dy: isHorizontal ? 0 : -10, color: '#e5e7eb' },
           encoding: isHorizontal ? {
             x: { field: config.yField, type: 'quantitative' },
-            y: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            y: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
             text: { 
               field: funnelLabelType === 'value' ? config.yField 
                     : funnelLabelType === 'percentage' ? 'percentage'
@@ -538,7 +538,7 @@ export function generateVegaSpec(
             }
           } : {
             y: { field: config.yField, type: 'quantitative' },
-            x: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            x: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
             text: { 
               field: funnelLabelType === 'value' ? config.yField 
                     : funnelLabelType === 'percentage' ? 'percentage'
@@ -573,14 +573,14 @@ export function generateVegaSpec(
           ],
           encoding: isHorizontal ? {
             x: { field: config.yField, type: 'quantitative' },
-            y: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            y: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
             text: { 
               field: 'conversionRate',
               type: 'nominal'
             }
           } : {
             y: { field: config.yField, type: 'quantitative' },
-            x: { field: config.xField, type: 'nominal', sort: processedData.map(d => d[config.xField!]) },
+            x: { field: config.xField, type: 'nominal', sort: { field: 'order', order: 'ascending' } },
             text: { 
               field: 'conversionRate',
               type: 'nominal'
