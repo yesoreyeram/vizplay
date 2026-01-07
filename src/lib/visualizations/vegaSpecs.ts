@@ -42,7 +42,7 @@ export const visualizationTypes = [
 ];
 
 export function generateVegaSpec(
-  data: any[],
+  data: Record<string, unknown>[],
   config: VisualizationConfig
 ): TopLevelSpec {
   // Determine legend configuration
@@ -50,7 +50,7 @@ export function generateVegaSpec(
   const showLegend = legendPosition !== 'none';
   const legendOrient = legendPosition === 'none' ? 'right' : legendPosition;
   
-  const baseSpec: any = {
+  const baseSpec: Record<string, unknown> = {
     $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
     width: 'container',
     height: 'container',
@@ -96,7 +96,7 @@ export function generateVegaSpec(
       let processedData = data;
       if (xAxisSort !== 'none' && topN > 0) {
         // Group and sum by x field, then take top N
-        const aggregated = data.reduce((acc: any, item: any) => {
+        const aggregated = data.reduce((acc: Record<string, number>, item) => {
           const key = item[config.xField!];
           if (!acc[key]) {
             acc[key] = 0;
@@ -106,11 +106,11 @@ export function generateVegaSpec(
         }, {});
         
         const sorted = Object.entries(aggregated)
-          .sort(([, a]: any, [, b]: any) => xAxisSort === 'ascending' ? a - b : b - a)
+          .sort(([, a], [, b]) => xAxisSort === 'ascending' ? (a as number) - (b as number) : (b as number) - (a as number))
           .slice(0, topN)
           .map(([key]) => key);
         
-        processedData = data.filter((item: any) => sorted.includes(item[config.xField!]));
+        processedData = data.filter((item) => sorted.includes(item[config.xField!] as string));
       }
 
       // Determine x and y encodings based on orientation
@@ -118,7 +118,7 @@ export function generateVegaSpec(
       
       // Handle Gantt chart (ranged bars)
       if (barStyle === 'gantt' && config.xField2) {
-        const ganttSpec: any = {
+        const ganttSpec: Record<string, unknown> = {
           ...baseSpec,
           data: { values: processedData },
           mark: { type: 'bar', tooltip: true },
@@ -134,7 +134,7 @@ export function generateVegaSpec(
 
       // Handle diverging bar chart
       if (barStyle === 'diverging') {
-        const divergingSpec: any = {
+        const divergingSpec: Record<string, unknown> = {
           ...baseSpec,
           data: { values: processedData },
           mark: { type: 'bar', tooltip: true },
@@ -176,7 +176,7 @@ export function generateVegaSpec(
 
       // Handle diverging stacked bar chart (with neutral parts)
       if (barStyle === 'diverging-stacked' && config.colorField && config.colorField !== '__none__') {
-        const divergingStackedSpec: any = {
+        const divergingStackedSpec: Record<string, unknown> = {
           ...baseSpec,
           data: { values: processedData },
           mark: { type: 'bar', tooltip: true },
@@ -214,10 +214,10 @@ export function generateVegaSpec(
       }
 
       // Standard bar encodings
-      let xEncoding: any = isHorizontal 
+      let xEncoding: Record<string, unknown> = isHorizontal
         ? { field: config.yField, type: 'quantitative' }
         : { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } };
-      let yEncoding: any = isHorizontal
+      let yEncoding: Record<string, unknown> = isHorizontal
         ? { field: config.xField, type: 'nominal' }
         : { field: config.yField, type: 'quantitative' };
       
@@ -259,13 +259,13 @@ export function generateVegaSpec(
         }
       }
 
-      const baseBarSpec: any = {
+      const baseBarSpec: Record<string, unknown> = {
         ...baseSpec,
         data: { values: processedData },
       };
 
       // Build color encoding
-      let colorEncoding: any;
+      let colorEncoding: Record<string, unknown> | undefined;
       if (colorGradient && config.yField) {
         colorEncoding = { 
           field: config.yField, 
@@ -286,10 +286,10 @@ export function generateVegaSpec(
 
       // Create layers for bar chart with text labels or reference line
       if (showTextLabels || showReferenceLine) {
-        const layers: any[] = [];
-        
+        const layers: Record<string, unknown>[] = [];
+
         // Add bar layer
-        const barLayer: any = {
+        const barLayer: Record<string, unknown> = {
           mark: { type: 'bar', tooltip: true },
           encoding: {
             ...( isHorizontal ? { x: xEncoding, y: yEncoding } : { x: xEncoding, y: yEncoding }),
@@ -305,7 +305,7 @@ export function generateVegaSpec(
         
         // Add text labels layer
         if (showTextLabels) {
-          const textLayer: any = {
+          const textLayer: Record<string, unknown> = {
             mark: { type: 'text', dy: isHorizontal ? 0 : -10, dx: isHorizontal ? 10 : 0, color: '#e5e7eb' },
             encoding: {
               ...( isHorizontal ? { x: xEncoding, y: yEncoding } : { x: xEncoding, y: yEncoding }),
@@ -322,7 +322,7 @@ export function generateVegaSpec(
         
         // Add reference line layer
         if (showReferenceLine && config.referenceLine !== undefined) {
-          const refLayer: any = {
+          const refLayer: Record<string, unknown> = {
             mark: { type: 'rule', strokeDash: [4, 4], stroke: '#fbbf24', size: 2 },
             encoding: isHorizontal ? {
               x: { datum: config.referenceLine }
@@ -435,7 +435,7 @@ export function generateVegaSpec(
         },
       };
 
-    case 'heatlane':
+    case 'heatlane': {
       // Heat lane chart - horizontal lanes with color intensity
       // Requires a quantitative field for color encoding
       const colorFieldForHeat = config.colorField && config.colorField !== '__none__' ? config.colorField : config.sizeField;
@@ -460,6 +460,7 @@ export function generateVegaSpec(
           mark: { tooltip: { content: 'data' } }
         }
       };
+    }
 
     case 'boxplot':
       return {
@@ -490,8 +491,8 @@ export function generateVegaSpec(
       // For custom viz, user builds spec using UI
       if (config.customVizConfig && config.customVizConfig.layers.length > 0) {
         try {
-          const layers = config.customVizConfig.layers.map((layer: any) => {
-            const layerSpec: any = {
+          const layers = config.customVizConfig.layers.map((layer) => {
+            const layerSpec: Record<string, unknown> = {
               mark: layer.markOptions ? { type: layer.mark, ...layer.markOptions } : layer.mark,
               encoding: {},
             };
@@ -583,7 +584,7 @@ export function generateVegaSpec(
   }
 }
 
-export function getAvailableFields(data: any[]): string[] {
+export function getAvailableFields(data: Record<string, unknown>[]): string[] {
   if (!data || data.length === 0) return [];
   return Object.keys(data[0]);
 }

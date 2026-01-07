@@ -16,8 +16,8 @@ export function parseData(
   format: DataFormat,
   jsonataExpression?: string,
   fieldMappings?: FieldMapping[]
-): any[] {
-  let parsedData: any;
+): unknown[] {
+  let parsedData: unknown;
 
   try {
     // Parse based on format
@@ -26,7 +26,7 @@ export function parseData(
         parsedData = JSON.parse(rawData);
         break;
       
-      case 'csv':
+      case 'csv': {
         const csvResult = Papa.parse(rawData, {
           header: true,
           dynamicTyping: true,
@@ -34,8 +34,9 @@ export function parseData(
         });
         parsedData = csvResult.data;
         break;
-      
-      case 'tsv':
+      }
+
+      case 'tsv': {
         const tsvResult = Papa.parse(rawData, {
           header: true,
           delimiter: '\t',
@@ -44,11 +45,13 @@ export function parseData(
         });
         parsedData = tsvResult.data;
         break;
-      
-      case 'xml':
+      }
+
+      case 'xml': {
         const xmlResult = xml2js(rawData, { compact: true });
         parsedData = xmlResult;
         break;
+      }
       
       case 'yaml':
         parsedData = yaml.load(rawData);
@@ -98,8 +101,8 @@ export function parseData(
 
     // Apply field mappings
     if (fieldMappings && fieldMappings.length > 0) {
-      parsedData = parsedData.map((item: any) => {
-        const mappedItem: any = { ...item };
+      parsedData = (parsedData as Record<string, unknown>[]).map((item) => {
+        const mappedItem: Record<string, unknown> = { ...item };
         
         fieldMappings.forEach(mapping => {
           if (item[mapping.field] !== undefined) {
@@ -118,16 +121,17 @@ export function parseData(
   }
 }
 
-function convertFieldType(value: any, type: FieldType): any {
+function convertFieldType(value: unknown, type: FieldType): unknown {
   if (value === null || value === undefined) return value;
 
   switch (type) {
     case 'string':
       return String(value);
-    
-    case 'number':
+
+    case 'number': {
       const num = Number(value);
       return isNaN(num) ? value : num;
+    }
     
     case 'boolean':
       if (typeof value === 'boolean') return value;
@@ -153,7 +157,7 @@ function convertFieldType(value: any, type: FieldType): any {
   }
 }
 
-export function inferDataSchema(data: any[]): FieldMapping[] {
+export function inferDataSchema(data: Record<string, unknown>[]): FieldMapping[] {
   if (!data || data.length === 0) return [];
 
   const sample = data[0];

@@ -71,7 +71,7 @@ function App() {
 
   // Track previous viz type for migration
   const prevVizTypeRef = useRef<string>(vizType);
-  const configSnapshotRef = useRef<any>(null);
+  const configSnapshotRef = useRef<Record<string, unknown> | null>(null);
 
   // Capture config snapshot whenever non-custom viz type changes
   useEffect(() => {
@@ -140,6 +140,7 @@ function App() {
   useEffect(() => {
     if (parsedData.length > 0 && fieldMappings.length === 0) {
       const inferred = inferDataSchema(parsedData);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFieldMappings(inferred);
     }
   }, [parsedData, fieldMappings.length]);
@@ -148,6 +149,7 @@ function App() {
   useEffect(() => {
     if (availableFields.length > 0) {
       if (!xField || !availableFields.includes(xField)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setXField(availableFields[0]);
       }
       if (!yField || !availableFields.includes(yField)) {
@@ -173,8 +175,9 @@ function App() {
         // Only update if current fields are not numeric
         const xVal = parsedData[0]?.[xField];
         const yVal = parsedData[0]?.[yField];
-        
+
         if (typeof xVal !== 'number') {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setXField(numericFields[0]);
         }
         if (typeof yVal !== 'number') {
