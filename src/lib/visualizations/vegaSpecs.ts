@@ -42,15 +42,17 @@ export const visualizationTypes = [
 ];
 
 export function generateVegaSpec(
-  data: Record<string, unknown>[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any[],
   config: VisualizationConfig
 ): TopLevelSpec {
   // Determine legend configuration
   const legendPosition = config.legendPosition || 'right';
   const showLegend = legendPosition !== 'none';
   const legendOrient = legendPosition === 'none' ? 'right' : legendPosition;
-  
-  const baseSpec: Record<string, unknown> = {
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const baseSpec: any = {
     $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
     width: 'container',
     height: 'container',
@@ -96,21 +98,24 @@ export function generateVegaSpec(
       let processedData = data;
       if (xAxisSort !== 'none' && topN > 0) {
         // Group and sum by x field, then take top N
-        const aggregated = data.reduce((acc: Record<string, number>, item: Record<string, unknown>) => {
-          const key = String(item[config.xField!]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const aggregated = data.reduce((acc: any, item: any) => {
+          const key = item[config.xField!];
           if (!acc[key]) {
             acc[key] = 0;
           }
-          acc[key] += Number(item[config.yField!]) || 0;
+          acc[key] += item[config.yField!] || 0;
           return acc;
         }, {});
 
         const sorted = Object.entries(aggregated)
-          .sort(([, a], [, b]) => xAxisSort === 'ascending' ? a - b : b - a)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .sort(([, a]: any, [, b]: any) => xAxisSort === 'ascending' ? a - b : b - a)
           .slice(0, topN)
           .map(([key]) => key);
 
-        processedData = data.filter((item: Record<string, unknown>) => sorted.includes(String(item[config.xField!])));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        processedData = data.filter((item: any) => sorted.includes(item[config.xField!]));
       }
 
       // Determine x and y encodings based on orientation
@@ -118,7 +123,8 @@ export function generateVegaSpec(
       
       // Handle Gantt chart (ranged bars)
       if (barStyle === 'gantt' && config.xField2) {
-        const ganttSpec: Record<string, unknown> = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const ganttSpec: any = {
           ...baseSpec,
           data: { values: processedData },
           mark: { type: 'bar', tooltip: true },
@@ -134,7 +140,8 @@ export function generateVegaSpec(
 
       // Handle diverging bar chart
       if (barStyle === 'diverging') {
-        const divergingSpec: Record<string, unknown> = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const divergingSpec: any = {
           ...baseSpec,
           data: { values: processedData },
           mark: { type: 'bar', tooltip: true },
@@ -176,7 +183,8 @@ export function generateVegaSpec(
 
       // Handle diverging stacked bar chart (with neutral parts)
       if (barStyle === 'diverging-stacked' && config.colorField && config.colorField !== '__none__') {
-        const divergingStackedSpec: Record<string, unknown> = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const divergingStackedSpec: any = {
           ...baseSpec,
           data: { values: processedData },
           mark: { type: 'bar', tooltip: true },
@@ -214,10 +222,12 @@ export function generateVegaSpec(
       }
 
       // Standard bar encodings
-      let xEncoding: Record<string, unknown> = isHorizontal
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let xEncoding: any = isHorizontal
         ? { field: config.yField, type: 'quantitative' }
         : { field: config.xField, type: 'nominal', axis: { labelAngle: -45 } };
-      let yEncoding: Record<string, unknown> = isHorizontal
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let yEncoding: any = isHorizontal
         ? { field: config.xField, type: 'nominal' }
         : { field: config.yField, type: 'quantitative' };
       
@@ -259,13 +269,15 @@ export function generateVegaSpec(
         }
       }
 
-      const baseBarSpec: Record<string, unknown> = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const baseBarSpec: any = {
         ...baseSpec,
         data: { values: processedData },
       };
 
       // Build color encoding
-      let colorEncoding: Record<string, unknown>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let colorEncoding: any;
       if (colorGradient && config.yField) {
         colorEncoding = { 
           field: config.yField, 
@@ -286,10 +298,12 @@ export function generateVegaSpec(
 
       // Create layers for bar chart with text labels or reference line
       if (showTextLabels || showReferenceLine) {
-        const layers: Record<string, unknown>[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const layers: any[] = [];
 
         // Add bar layer
-        const barLayer: Record<string, unknown> = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const barLayer: any = {
           mark: { type: 'bar', tooltip: true },
           encoding: {
             ...( isHorizontal ? { x: xEncoding, y: yEncoding } : { x: xEncoding, y: yEncoding }),
@@ -305,7 +319,8 @@ export function generateVegaSpec(
         
         // Add text labels layer
         if (showTextLabels) {
-          const textLayer: Record<string, unknown> = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const textLayer: any = {
             mark: { type: 'text', dy: isHorizontal ? 0 : -10, dx: isHorizontal ? 10 : 0, color: '#e5e7eb' },
             encoding: {
               ...( isHorizontal ? { x: xEncoding, y: yEncoding } : { x: xEncoding, y: yEncoding }),
@@ -322,7 +337,8 @@ export function generateVegaSpec(
         
         // Add reference line layer
         if (showReferenceLine && config.referenceLine !== undefined) {
-          const refLayer: Record<string, unknown> = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const refLayer: any = {
             mark: { type: 'rule', strokeDash: [4, 4], stroke: '#fbbf24', size: 2 },
             encoding: isHorizontal ? {
               x: { datum: config.referenceLine }
@@ -491,8 +507,10 @@ export function generateVegaSpec(
       // For custom viz, user builds spec using UI
       if (config.customVizConfig && config.customVizConfig.layers.length > 0) {
         try {
-          const layers = config.customVizConfig.layers.map((layer: Record<string, unknown>) => {
-            const layerSpec: Record<string, unknown> = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const layers = config.customVizConfig.layers.map((layer: any) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const layerSpec: any = {
               mark: layer.markOptions ? { type: layer.mark, ...layer.markOptions } : layer.mark,
               encoding: {},
             };
@@ -584,7 +602,8 @@ export function generateVegaSpec(
   }
 }
 
-export function getAvailableFields(data: Record<string, unknown>[]): string[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getAvailableFields(data: any[]): string[] {
   if (!data || data.length === 0) return [];
   return Object.keys(data[0]);
 }

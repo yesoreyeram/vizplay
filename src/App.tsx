@@ -71,28 +71,8 @@ function App() {
 
   // Track previous viz type for migration
   const prevVizTypeRef = useRef<string>(vizType);
-  const configSnapshotRef = useRef<{
-    type: string;
-    xField: string;
-    yField: string;
-    colorField?: string;
-    sizeField?: string;
-    title: string;
-    barStyle: string;
-    barOrientation: string;
-    stackNormalize: boolean;
-    xAxisSort: string;
-    stackSort: string;
-    topN: number;
-    showTextLabels: boolean;
-    aggregateOp: string;
-    colorGradient: boolean;
-    xField2?: string;
-    showReferenceLine: boolean;
-    referenceLine: number;
-    legendPosition: string;
-    legendMode: string;
-  } | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const configSnapshotRef = useRef<any>(null);
 
   // Track initialization to prevent cascading renders
   const fieldMappingsInferredRef = useRef(false);

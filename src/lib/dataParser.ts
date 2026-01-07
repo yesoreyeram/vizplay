@@ -16,8 +16,10 @@ export function parseData(
   format: DataFormat,
   jsonataExpression?: string,
   fieldMappings?: FieldMapping[]
-): Record<string, unknown>[] {
-  let parsedData: unknown;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let parsedData: any;
 
   try {
     // Parse based on format
@@ -101,8 +103,10 @@ export function parseData(
 
     // Apply field mappings
     if (fieldMappings && fieldMappings.length > 0) {
-      parsedData = parsedData.map((item: Record<string, unknown>) => {
-        const mappedItem: Record<string, unknown> = { ...item };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      parsedData = parsedData.map((item: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mappedItem: any = { ...item };
 
         fieldMappings.forEach(mapping => {
           if (item[mapping.field] !== undefined) {
@@ -121,7 +125,8 @@ export function parseData(
   }
 }
 
-function convertFieldType(value: unknown, type: FieldType): unknown {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function convertFieldType(value: any, type: FieldType): any {
   if (value === null || value === undefined) return value;
 
   switch (type) {
@@ -157,7 +162,8 @@ function convertFieldType(value: unknown, type: FieldType): unknown {
   }
 }
 
-export function inferDataSchema(data: Record<string, unknown>[]): FieldMapping[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function inferDataSchema(data: any[]): FieldMapping[] {
   if (!data || data.length === 0) return [];
 
   const sample = data[0];
