@@ -70,7 +70,10 @@ export function DataParsingControls({
           className="font-mono text-xs h-16 resize-none"
         />
         <p className="text-xs text-muted-foreground leading-tight">
-          Transform your data using JSONata query expressions
+          Transform your data using JSONata query expressions.
+        </p>
+        <p className="text-xs text-yellow-600 dark:text-yellow-500 leading-tight">
+          ⚠️ Only use with trusted data sources. Malicious expressions are blocked.
         </p>
       </div>
 

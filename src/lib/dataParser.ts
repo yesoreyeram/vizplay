@@ -61,10 +61,33 @@ export function parseData(
     // Apply JSONata transformation if provided
     if (jsonataExpression && jsonataExpression.trim()) {
       try {
+        // Validate JSONata expression for dangerous patterns
+        const dangerousPatterns = [
+          /\$\$/, // Context variable manipulation
+          /eval\s*\(/i,
+          /Function\s*\(/i,
+          /__proto__/,
+          /constructor/,
+          /prototype/,
+        ];
+
+        const hasDangerousPattern = dangerousPatterns.some(pattern =>
+          pattern.test(jsonataExpression)
+        );
+
+        if (hasDangerousPattern) {
+          console.warn('JSONata expression contains potentially dangerous patterns and was blocked');
+          throw new Error('Expression contains forbidden patterns');
+        }
+
         const expression = jsonata(jsonataExpression);
+
+        // Evaluate the expression with the parsed data
         parsedData = expression.evaluate(parsedData);
       } catch (error) {
         console.error('JSONata expression error:', error);
+        // Re-throw to allow caller to handle
+        throw error;
       }
     }
 
