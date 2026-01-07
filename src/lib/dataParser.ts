@@ -16,7 +16,9 @@ export function parseData(
   format: DataFormat,
   jsonataExpression?: string,
   fieldMappings?: FieldMapping[]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let parsedData: any;
 
   try {
@@ -25,8 +27,8 @@ export function parseData(
       case 'json':
         parsedData = JSON.parse(rawData);
         break;
-      
-      case 'csv':
+
+      case 'csv': {
         const csvResult = Papa.parse(rawData, {
           header: true,
           dynamicTyping: true,
@@ -34,8 +36,9 @@ export function parseData(
         });
         parsedData = csvResult.data;
         break;
-      
-      case 'tsv':
+      }
+
+      case 'tsv': {
         const tsvResult = Papa.parse(rawData, {
           header: true,
           delimiter: '\t',
@@ -44,16 +47,18 @@ export function parseData(
         });
         parsedData = tsvResult.data;
         break;
-      
-      case 'xml':
+      }
+
+      case 'xml': {
         const xmlResult = xml2js(rawData, { compact: true });
         parsedData = xmlResult;
         break;
-      
+      }
+
       case 'yaml':
         parsedData = yaml.load(rawData);
         break;
-      
+
       default:
         parsedData = JSON.parse(rawData);
     }
@@ -98,15 +103,17 @@ export function parseData(
 
     // Apply field mappings
     if (fieldMappings && fieldMappings.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       parsedData = parsedData.map((item: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mappedItem: any = { ...item };
-        
+
         fieldMappings.forEach(mapping => {
           if (item[mapping.field] !== undefined) {
             mappedItem[mapping.field] = convertFieldType(item[mapping.field], mapping.type);
           }
         });
-        
+
         return mappedItem;
       });
     }
@@ -118,16 +125,18 @@ export function parseData(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function convertFieldType(value: any, type: FieldType): any {
   if (value === null || value === undefined) return value;
 
   switch (type) {
     case 'string':
       return String(value);
-    
-    case 'number':
+
+    case 'number': {
       const num = Number(value);
       return isNaN(num) ? value : num;
+    }
     
     case 'boolean':
       if (typeof value === 'boolean') return value;
@@ -153,6 +162,7 @@ function convertFieldType(value: any, type: FieldType): any {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function inferDataSchema(data: any[]): FieldMapping[] {
   if (!data || data.length === 0) return [];
 
