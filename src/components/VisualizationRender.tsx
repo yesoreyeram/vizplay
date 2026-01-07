@@ -13,8 +13,10 @@ export function VisualizationRender({ spec, error }: VisualizationRenderProps) {
 
   useEffect(() => {
     if (containerRef.current && spec) {
-      // Clear previous visualization
-      containerRef.current.innerHTML = '';
+      // Clear previous visualization using safer method than innerHTML
+      while (containerRef.current.firstChild) {
+        containerRef.current.removeChild(containerRef.current.firstChild);
+      }
 
       // Embed the Vega-Lite spec
       embed(containerRef.current, spec, {
