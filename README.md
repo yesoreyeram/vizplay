@@ -1,5 +1,9 @@
 # VizPlay - Enterprise Data Visualization Playground
 
+[![CI](https://github.com/yesoreyeram/vizplay/actions/workflows/ci.yml/badge.svg)](https://github.com/yesoreyeram/vizplay/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/yesoreyeram/vizplay/actions/workflows/codeql.yml/badge.svg)](https://github.com/yesoreyeram/vizplay/actions/workflows/codeql.yml)
+[![Deploy](https://github.com/yesoreyeram/vizplay/actions/workflows/deploy.yml/badge.svg)](https://github.com/yesoreyeram/vizplay/actions/workflows/deploy.yml)
+
 A modern, enterprise-grade data visualization playground built with React, TypeScript, and Vega-Lite.
 
 ## Features
