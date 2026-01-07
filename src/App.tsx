@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 import { TopNavbar } from './components/TopNavbar';
 import { BottomNavbar } from './components/BottomNavbar';
 import { DataInputSection } from './components/DataInputSection';
@@ -71,7 +71,12 @@ function App() {
 
   // Track previous viz type for migration
   const prevVizTypeRef = useRef<string>(vizType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const configSnapshotRef = useRef<any>(null);
+
+  // Track initialization to prevent cascading renders
+  const fieldMappingsInferredRef = useRef(false);
+  const fieldsInitializedRef = useRef(false);
 
   // Capture config snapshot whenever non-custom viz type changes
   useEffect(() => {
@@ -138,31 +143,39 @@ function App() {
 
   // Auto-infer field mappings when data changes (if no manual mappings)
   useEffect(() => {
-    if (parsedData.length > 0 && fieldMappings.length === 0) {
+    if (parsedData.length > 0 && fieldMappings.length === 0 && !fieldMappingsInferredRef.current) {
       const inferred = inferDataSchema(parsedData);
-      setFieldMappings(inferred);
+      fieldMappingsInferredRef.current = true;
+      queueMicrotask(() => {
+        setFieldMappings(inferred);
+      });
     }
   }, [parsedData, fieldMappings.length]);
 
   // Auto-select fields for visualization
   useEffect(() => {
-    if (availableFields.length > 0) {
-      if (!xField || !availableFields.includes(xField)) {
-        setXField(availableFields[0]);
-      }
-      if (!yField || !availableFields.includes(yField)) {
-        const numericField = availableFields.find(f => {
-          const val = parsedData[0]?.[f];
-          return typeof val === 'number';
-        });
-        setYField(numericField || availableFields[1] || availableFields[0]);
-      }
+    if (availableFields.length > 0 && !fieldsInitializedRef.current) {
+      queueMicrotask(() => {
+        if (!xField || !availableFields.includes(xField)) {
+          setXField(availableFields[0]);
+        }
+        if (!yField || !availableFields.includes(yField)) {
+          const numericField = availableFields.find(f => {
+            const val = parsedData[0]?.[f];
+            return typeof val === 'number';
+          });
+          setYField(numericField || availableFields[1] || availableFields[0]);
+        }
+      });
+      fieldsInitializedRef.current = true;
     }
   }, [availableFields, parsedData, xField, yField]);
 
   // Auto-select numeric fields when switching to scatter plot
+  const prevVizTypeForScatterRef = useRef(vizType);
   useEffect(() => {
-    if (vizType === 'scatter' && parsedData.length > 0) {
+    // Only run this when vizType changes to scatter
+    if (vizType === 'scatter' && prevVizTypeForScatterRef.current !== 'scatter' && parsedData.length > 0) {
       const numericFields = availableFields.filter(f => {
         const val = parsedData[0]?.[f];
         return typeof val === 'number';
@@ -170,18 +183,21 @@ function App() {
 
       // If we have at least 2 numeric fields, use them for scatter plot
       if (numericFields.length >= 2) {
-        // Only update if current fields are not numeric
-        const xVal = parsedData[0]?.[xField];
-        const yVal = parsedData[0]?.[yField];
-        
-        if (typeof xVal !== 'number') {
-          setXField(numericFields[0]);
-        }
-        if (typeof yVal !== 'number') {
-          setYField(numericFields[1] || numericFields[0]);
-        }
+        queueMicrotask(() => {
+          // Only update if current fields are not numeric
+          const xVal = parsedData[0]?.[xField];
+          const yVal = parsedData[0]?.[yField];
+
+          if (typeof xVal !== 'number') {
+            setXField(numericFields[0]);
+          }
+          if (typeof yVal !== 'number') {
+            setYField(numericFields[1] || numericFields[0]);
+          }
+        });
       }
     }
+    prevVizTypeForScatterRef.current = vizType;
   }, [vizType, parsedData, availableFields, xField, yField]);
 
   // Generate Vega spec
@@ -389,10 +405,10 @@ function App() {
       <TopNavbar />
       
       <div className="flex-1 overflow-hidden">
-        <PanelGroup direction="horizontal">
+        <Group orientation="horizontal">
           {/* Left Panel - Data Input */}
           <Panel defaultSize={50} minSize={30}>
-            <PanelGroup direction="vertical">
+            <Group orientation="vertical">
               {/* Data Input */}
               <Panel defaultSize={60} minSize={20}>
                 <div className="h-full border-r">
@@ -412,9 +428,9 @@ function App() {
                   </div>
                 </div>
               </Panel>
-              
-              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
-              
+
+              <Separator className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
+
               {/* Data Parsing Controls */}
               <Panel defaultSize={40} minSize={20}>
                 <div className="h-full border-r">
@@ -435,14 +451,14 @@ function App() {
                   </div>
                 </div>
               </Panel>
-            </PanelGroup>
+            </Group>
           </Panel>
-          
-          <PanelResizeHandle className="w-2 bg-border hover:bg-primary/20 transition-colors cursor-col-resize" />
-          
+
+          <Separator className="w-2 bg-border hover:bg-primary/20 transition-colors cursor-col-resize" />
+
           {/* Right Panel - Visualization */}
           <Panel defaultSize={50} minSize={30}>
-            <PanelGroup direction="vertical">
+            <Group orientation="vertical">
               {/* Visualization Render */}
               <Panel defaultSize={65} minSize={30}>
                 <div className="h-full">
@@ -456,9 +472,9 @@ function App() {
                   </div>
                 </div>
               </Panel>
-              
-              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
-              
+
+              <Separator className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
+
               {/* Visualization Controls */}
               <Panel defaultSize={35} minSize={20}>
                 <div className="h-full">
@@ -516,9 +532,9 @@ function App() {
                   </div>
                 </div>
               </Panel>
-            </PanelGroup>
+            </Group>
           </Panel>
-        </PanelGroup>
+        </Group>
       </div>
       
       <BottomNavbar dataStats={dataStats} />
