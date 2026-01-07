@@ -114,7 +114,7 @@ export function parseData(
       });
     }
 
-    return parsedData;
+    return parsedData as unknown[];
   } catch (error) {
     console.error('Data parsing error:', error);
     return [];
@@ -144,7 +144,7 @@ function convertFieldType(value: unknown, type: FieldType): unknown {
     
     case 'date':
     case 'datetime':
-      return new Date(value);
+      return new Date(value as string | number | Date);
     
     case 'epoch-s':
       return new Date(Number(value) * 1000);
