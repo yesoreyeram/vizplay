@@ -45,7 +45,51 @@ npm run preview
 
 # Run linter
 npm run lint
+
+# Run E2E tests
+npm run test:e2e
+
+# Run E2E tests in UI mode
+npm run test:e2e:ui
+
+# Run E2E tests in headed mode (see browser)
+npm run test:e2e:headed
+
+# Debug E2E tests
+npm run test:e2e:debug
 ```
+
+## Testing
+
+This project includes comprehensive E2E tests using Playwright.
+
+### Running Tests
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run tests with UI (interactive mode)
+npm run test:e2e:ui
+
+# Run tests in headed mode (see browser)
+npm run test:e2e:headed
+
+# Debug tests step-by-step
+npm run test:e2e:debug
+```
+
+### Test Coverage
+
+The E2E test suite covers:
+- Application loading and initialization
+- Sample dataset loading and filtering
+- Visualization type switching (bar, line, scatter, pie charts)
+- Custom data input (JSON, CSV formats)
+- Chart customization (titles, fields)
+- UI component interactions
+
+Tests run automatically in GitHub Actions on every push and pull request.
 
 ## Usage
 
