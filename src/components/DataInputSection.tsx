@@ -98,7 +98,7 @@ export function DataInputSection({ value, onChange, onLoadDataset, onTabChange, 
         previewData = [previewData];
       }
     }
-  } catch (e) {
+  } catch {
     previewData = [];
   }
 
@@ -111,7 +111,7 @@ export function DataInputSection({ value, onChange, onLoadDataset, onTabChange, 
         uploadPreviewData = [uploadPreviewData];
       }
     }
-  } catch (e) {
+  } catch {
     uploadPreviewData = [];
   }
 
