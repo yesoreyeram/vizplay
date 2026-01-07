@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 import { TopNavbar } from './components/TopNavbar';
 import { BottomNavbar } from './components/BottomNavbar';
 import { DataInputSection } from './components/DataInputSection';
@@ -405,10 +405,10 @@ function App() {
       <TopNavbar />
       
       <div className="flex-1 overflow-hidden">
-        <PanelGroup direction="horizontal">
+        <Group orientation="horizontal">
           {/* Left Panel - Data Input */}
           <Panel defaultSize={50} minSize={30}>
-            <PanelGroup direction="vertical">
+            <Group orientation="vertical">
               {/* Data Input */}
               <Panel defaultSize={60} minSize={20}>
                 <div className="h-full border-r">
@@ -428,9 +428,9 @@ function App() {
                   </div>
                 </div>
               </Panel>
-              
-              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
-              
+
+              <Separator className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
+
               {/* Data Parsing Controls */}
               <Panel defaultSize={40} minSize={20}>
                 <div className="h-full border-r">
@@ -451,14 +451,14 @@ function App() {
                   </div>
                 </div>
               </Panel>
-            </PanelGroup>
+            </Group>
           </Panel>
-          
-          <PanelResizeHandle className="w-2 bg-border hover:bg-primary/20 transition-colors cursor-col-resize" />
-          
+
+          <Separator className="w-2 bg-border hover:bg-primary/20 transition-colors cursor-col-resize" />
+
           {/* Right Panel - Visualization */}
           <Panel defaultSize={50} minSize={30}>
-            <PanelGroup direction="vertical">
+            <Group orientation="vertical">
               {/* Visualization Render */}
               <Panel defaultSize={65} minSize={30}>
                 <div className="h-full">
@@ -472,9 +472,9 @@ function App() {
                   </div>
                 </div>
               </Panel>
-              
-              <PanelResizeHandle className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
-              
+
+              <Separator className="h-2 bg-border hover:bg-primary/20 transition-colors cursor-row-resize" />
+
               {/* Visualization Controls */}
               <Panel defaultSize={35} minSize={20}>
                 <div className="h-full">
@@ -532,9 +532,9 @@ function App() {
                   </div>
                 </div>
               </Panel>
-            </PanelGroup>
+            </Group>
           </Panel>
-        </PanelGroup>
+        </Group>
       </div>
       
       <BottomNavbar dataStats={dataStats} />
